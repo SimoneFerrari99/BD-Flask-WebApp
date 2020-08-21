@@ -1,0 +1,19 @@
+{% extends "main_template.html" %}
+
+{% block pagebody %}
+  <script src="{{url_for('static', filename='aggiungi_proiezioni.js')}}"></script>
+  <form method="post">
+
+    <label for = "film">Film:</label>
+    <select name="film" id="film">
+      {% for id_film, titolo in film_dict.items() %}
+      <option value={{id_film}}>{{titolo[0]}}</option>
+      {% endfor %}
+    </select><br>
+
+    <span id="proiezioni" name="proiezioni"></span>
+
+    <button type="button" name="button" onclick='addProjection({{ sale|safe }})'>Aggiungi una proiezione</button><br>
+    <button type = "submit" name = "Submit" value = "Invia">Invia
+  </form>
+{% endblock %}

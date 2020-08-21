@@ -1,0 +1,15 @@
+{% extends "main_template.html" %}
+
+{% block pagebody %}
+
+  <form method = "post"  autocomplete = "on" enctype = ”text/plain”>
+
+    <label for = "tipo">Tipo:</label>
+    <input id = "tipo" name = "tipo" type = "text" autofocus><br>
+
+    <button type = "submit" name = "Submit" value = "Invia">Invia
+    <button type = "reset" value = "Reset">Reset
+
+  </form>
+
+{% endblock %}

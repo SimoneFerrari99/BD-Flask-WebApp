@@ -1,0 +1,14 @@
+{% extends "main_template.html" %}
+
+{% block pagebody %}
+
+  <h2>A breve in sala...</h2>
+  {% for id_film, elem_list in film_dict.items() %}
+    <img src="static/copertine/{{ id_film }}.jpg" alt="copertina di {{ elem_list[0] }}">
+    <h3 id="titolo">Titolo: {{ elem_list[0] }}</h3>
+    <h4 id="durata">Durata: {{ elem_list[1] }} minuti</h4>
+    <p id="descrizione">{{ elem_list[2] }}</p>
+  {% endfor %}
+
+
+{% endblock %}

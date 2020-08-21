@@ -1,0 +1,14 @@
+{% extends "main_template.html" %}
+
+{% block pagebody %}
+
+  <h2>Sale disponibili:</h2><br>
+  {% for n_sala in sale %}
+    <p id="sala">{{ n_sala }}</p>
+  {% endfor %}
+  <form method="post">
+    <button type = "submit" name = "aggiungi_sala">Aggiungi sala
+  </form>
+
+
+{% endblock %}

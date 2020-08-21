@@ -1,0 +1,31 @@
+{% extends "main_template.html" %}
+
+{% block pagebody %}
+
+  <form method = "post"  autocomplete = "on" enctype = ”text/plain”>
+
+    <label for = "nome">Nome:</label>
+    <input id = "nome" name = "nome" type = "text" autofocus pattern="^[a-zA-Z ']*$" title="inserire un nome valido"><br>
+    <label for = "cognome">Cognome:</label>
+    <input id = "cognome" name = "cognome" type = "text" pattern="^[a-zA-Z ']*$" title="inserire un cognome valido"><br>
+
+    <label for = "data_nascita">Data di Nascita:</label>
+    <input id = "data_nascita" name = "data_nascita" type = "date"><br>
+
+    <label for = "email">Email:</label>
+    <input id = "email" name = "email" type = "email" placeholder = "nomeutente@dominio.com" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z.]{2,}$" title="inserire una mail valida"><br>
+
+    <label for = "psw">Password:</label>
+    <input id = "psw" name = "psw" type = "password"  title = "Utilizzare esclusivamente caratteri ASCII, come a-z, A-Z, 0-9, e caratteri di punteggiatura, come '!' e '%'"><br>
+
+    <label for = "conferma_password">Conferma Password:</label>
+    <input id = "conferma_password" name = "conferma_password" type = "password"><br>
+    {% if errore %}
+      <h3>Errore: le password non corrispondono!</h3><br>
+    {% endif %}
+    <button type = "submit" name = "Submit" value = "Registrati">Registrati
+    <button type = "reset" value = "Reset">Reset
+
+  </form>
+
+{% endblock %}

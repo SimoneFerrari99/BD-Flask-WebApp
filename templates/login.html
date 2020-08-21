@@ -1,0 +1,13 @@
+{% extends "main_template.html" %} {% block pagebody %}
+
+<form method="post">
+	<label for="email">Email:</label>
+	<input type="text" name="email" id="email" /><br />
+	<label for="psw">Password:</label>
+	<input type="password" name="psw" id="psw" /><br />
+	<button type="submit">Login</button><br />
+</form>
+
+<a href="/registrazione">Non sei ancora registrato? Registrati!</a>
+
+{% endblock %}
