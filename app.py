@@ -10,7 +10,6 @@ from flask import Flask, render_template, url_for, redirect, request, session, f
 from flask_bcrypt import Bcrypt
 from sqlalchemy import create_engine, MetaData, Table, select
 from sqlalchemy.sql import func
-from classes import province
 from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user
 import json
 from PIL import Image
@@ -216,7 +215,7 @@ def aggiungi_persona():
         }
         conn = engine.connect()  # mi connetto
         conn.execute(ins, values)  # eseguo l'inserimento con i valori
-        if request.form["Submit"] == "Film":
+        if request.form["Submit"] == "Film": #abbiamo due diversi bottoni di sumbit
             return redirect(url_for('aggiungi_film'))  # return
         else:
             return redirect(url_for('aggiungi_persona'))
@@ -396,6 +395,7 @@ def aggiungi_genere():
 #--------------------------------------------------------------------------------------------#
 
 @app.route('/aggiungi_visualizza_saldo', methods=['GET', 'POST'])
+@login_required
 def aggiungi_visualizza_saldo():
      if request.method == "POST":
 
@@ -417,6 +417,17 @@ def aggiungi_visualizza_saldo():
          conn.execute(s)
 
          patrimonio = result.fetchone()
-         return render_template('aggiungi_visualizza_saldo.html', saldo = patrimonio)
+         return render_template('dashboard_account.html', saldo = patrimonio)
 
 #--------------------------------------------------------------------------------------------#
+
+@app.route('modifica_sicurezza', methods=['GET', 'POST'])
+@login_required
+def sicurezza():
+    if request.method == "POST":
+
+        nome = meta.tables['utenti']
+        email = meta.tables['utenti']
+        #MANCA
+
+    else:

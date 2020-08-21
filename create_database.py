@@ -125,13 +125,17 @@ conn.execute("CREATE USER admin WITH PASSWORD 'passwordadmin'")
 conn.execute("DROP ROLE IF EXISTS clienti")
 conn.execute("DROP ROLE IF EXISTS superuser")
 
-conn.execute("CREATE ROLE clienti")
-conn.execute("CREATE ROLE superuser SUPERUSER")
+conn.execute("CREATE ROLE clienti WITH OPTION LOGIN")
+conn.execute("CREATE ROLE superuser WITH OPTION SUPERUSER, CREATEDB, CREATEROLE, CREATEUSER, LOGIN, REPLICATION, ")
 
 conn.execute("GRANT SELECT ON ALL TABLES IN SCHEMA public TO clienti")
+#conn.execute("GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO superuser")
 
 conn.execute("GRANT clienti TO cliente")
 conn.execute("GRANT superuser TO admin")
+
+conn.execute("SET ROLE clienti")
+conn.execute("SET ROLE superuser")
 
 
 

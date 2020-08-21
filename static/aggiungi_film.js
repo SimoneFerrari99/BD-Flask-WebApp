@@ -1,10 +1,10 @@
-let i = 0;
+let i = 0; //variabile globale
 
-function increment() {
+function increment() { //funzione che incrementa la variabile globale i
 	i += 1;
 }
 
-function removeElement(parentDiv, childDiv) {
+function removeElement(parentDiv, childDiv) { //rimuove un elemento
 	if (childDiv == parentDiv) {
 		alert("The parent div cannot be removed.");
 	} else {
@@ -14,11 +14,11 @@ function removeElement(parentDiv, childDiv) {
 	}
 }
 
-function addPeople(persone, tipo) {
-	let span = document.createElement("SPAN");
+function addPeople(persone, tipo) { //funzione per aggiungere un campo attori o registi
+	let span = document.createElement("SPAN"); //creo lo span
 	span.setAttribute("id", "span_" + tipo + "_" + i);
 
-	let label = document.createElement("LABEL");
+	let label = document.createElement("LABEL"); //creo la label per attori o registi
 	label.setAttribute("for", tipo + "_" + i);
 	if (tipo.localeCompare("attori") == 0) {
 		label.innerHTML = "Attore: ";
@@ -31,13 +31,13 @@ function addPeople(persone, tipo) {
 	select.setAttribute("id", tipo + "_" + i);
 
 	for (let id in persone) {
-		let opt = document.createElement("OPTION");
+		let opt = document.createElement("OPTION"); //creo il menù a tendina
 		opt.setAttribute("value", id);
 		opt.text = persone[id];
 		select.appendChild(opt);
 	}
 
-	let addNewPeople = document.createElement("BUTTON");
+	let addNewPeople = document.createElement("BUTTON"); //creo un bottone per renderizzare
 	addNewPeople.setAttribute("type", "button");
 	addNewPeople.innerHTML = "Aggiungi nuova persona";
 
@@ -46,7 +46,7 @@ function addPeople(persone, tipo) {
 		"window.location.href = '/aggiungi_persona'"
 	);
 
-	let remove = document.createElement("BUTTON");
+	let remove = document.createElement("BUTTON"); //bottone per rimuovere la riga appena creata
 	remove.innerHTML = "Rimuovi";
 	let removeParent = '"' + tipo + '"';
 	let removeChild = '"span_' + tipo + '_' + i + '"';
@@ -56,6 +56,7 @@ function addPeople(persone, tipo) {
 		"removeElement(" + removeParent + ", " + removeChild + ")"
 	);
 
+	//appendo tutti gli oggetti allo span
 	span.appendChild(label);
 	span.appendChild(select);
 	span.appendChild(addNewPeople);
