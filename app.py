@@ -30,9 +30,8 @@ login_manager.init_app(app)
 
 # apriamo l'engine creato in precedenza in fase di creazione del database (file create_database.py)
 # engine = create_engine("postgres+psycopg2://postgres:ciao@serversrv.ddns.net:2345/progetto2020")
-engine = create_engine("postgres+psycopg2://cliente:'passwordcliente'@/progettobd")
-# engine = create_engine(
-# "postgres+psycopg2://postgres:simone@localhost/progettoBD2020")
+engine = create_engine("postgres+psycopg2://cliente:passwordcliente@localhost/progettobd")
+#engine = create_engine("postgres+psycopg2://postgres:simone@localhost/progettobd")
 
 # prendiamo i metadata dell'engine
 meta = MetaData(engine)
@@ -418,6 +417,6 @@ def aggiungi_visualizza_saldo():
          conn.execute(s)
 
          patrimonio = result.fetchone()
-         return render template('aggiungi_visualizza_saldo.html', saldo = patrimonio)
+         return render_template('aggiungi_visualizza_saldo.html', saldo = patrimonio)
 
 #--------------------------------------------------------------------------------------------#
