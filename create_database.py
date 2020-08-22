@@ -106,7 +106,7 @@ registi = Table('registi', metadata,
 metadata.create_all(engine)
 
 #---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---#
-
+# Creazione ruoli e assegnazione permessi
 # TODO:
 
 #       1) Creare un utente nel db per ogni utente del nostro sito, identificato da un nome utente (email) e Password (password)
@@ -116,26 +116,40 @@ metadata.create_all(engine)
 conn = engine.connect()
 
 
-conn.execute("DROP USER IF EXISTS cliente")
 conn.execute("DROP USER IF EXISTS admin")
+conn.execute("DROP USER IF EXISTS cliente")
+conn.execute("DROP USER IF EXISTS anonim")
 
-conn.execute("CREATE USER cliente WITH PASSWORD 'passwordcliente'")
 conn.execute("CREATE USER admin WITH PASSWORD 'passwordadmin'")
+conn.execute("CREATE USER cliente WITH PASSWORD 'passwordcliente'")
+conn.execute("CREATE USER anonim WITH PASSWORD 'passwordanonim'")
 
-conn.execute("DROP ROLE IF EXISTS clienti")
 conn.execute("DROP ROLE IF EXISTS superuser")
+conn.execute("DROP ROLE IF EXISTS clienti")
+conn.execute("DROP ROLE IF EXISTS anonimous")
 
-conn.execute("CREATE ROLE clienti WITH OPTION LOGIN")
-conn.execute("CREATE ROLE superuser WITH OPTION SUPERUSER, CREATEDB, CREATEROLE, CREATEUSER, LOGIN, REPLICATION, ")
+conn.execute("CREATE ROLE superuser WITH SUPERUSER CREATEDB CREATEROLE LOGIN")
+conn.execute("CREATE ROLE clienti WITH LOGIN")
+conn.execute("CREATE ROLE anonimous WITH LOGIN")
+
+
 
 conn.execute("GRANT SELECT ON ALL TABLES IN SCHEMA public TO clienti")
-#conn.execute("GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO superuser")
+conn.execute("GRANT UPDATE ON utenti TO clienti")
 
-conn.execute("GRANT clienti TO cliente")
+conn.execute("GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO superuser")
+conn.execute("GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO superuser")
+
+conn.execute("GRANT SELECT ON ALL TABLES IN SCHEMA public TO anonimous")
+conn.execute("GRANT INSERT ON utenti TO anonimous")
+
+
+
 conn.execute("GRANT superuser TO admin")
+conn.execute("GRANT clienti TO cliente")
+conn.execute("GRANT anonimous TO anonim")
 
-conn.execute("SET ROLE clienti")
-conn.execute("SET ROLE superuser")
+
 
 
 
