@@ -457,6 +457,20 @@ def aggiungi_genere():
             return render_template('aggiungi_genere.html')
     else:
         return redirect(url_for('login')) # TODO: inserire messaggio di errore
+
+#--------------------------------------------------------------------------------------------#
+# HOME PER LA GESTIONE DATABASE
+
+
+@app.route('/home_gestione_database')
+@login_required
+def home_gestione_database():
+    if(current_user.is_admin == True):
+        return render_template('home_gestione_database.html')
+    else:
+        return redirect(url_for('login'))
+
+
 #--------------------------------------------------------------------------------------------#
 
 @app.route('/aggiungi_visualizza_saldo', methods=['GET', 'POST'])

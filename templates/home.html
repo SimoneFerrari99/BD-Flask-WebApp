@@ -1,6 +1,8 @@
 {% extends "main_template.html" %}
 
 {% block pagebody %}
+  <h2>Sei un amministratore?</h2>
+  <input type="button" onclick="location.href='/home_gestione_database';" value="Gestisci database" />
 
   <h2>A breve in sala...</h2>
   {% for id_film, elem_list in film_dict.items() %}
