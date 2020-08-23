@@ -6,20 +6,23 @@
 # Descrizione: applicazione principale
 #---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---#
 # Moduli importati
-from flask import Flask, render_template, url_for, redirect, request, session, flash
+from flask import Flask, render_template, url_for, redirect, request, session, flash, abort
 from flask_bcrypt import Bcrypt
 from sqlalchemy import create_engine, MetaData, Table, select
 from sqlalchemy.sql import func
 from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user, current_user
-from route_per_navigare import *
 import json
 from PIL import Image
 
+from user_route import user_app
+from admin_route import admin_app
 
 #---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---#
 # Configurazione APP
 
 app = Flask(__name__)
+app.register_blueprint(user_app)
+app.register_blueprint(admin_app)
 bcrypt = Bcrypt(app)  # inizializzo il bycript della app
 
 #settiamo la secret_key per flask login... settata come consigliato nella documentazione di flask_login
@@ -99,7 +102,11 @@ def generate_sale_list():  # generatore di un dizionario per le sale
 @app.route('/')
 def home():
     dict = generate_film_dict()
-    return render_template('home.html', film_dict=dict)
+    if(current_user.is_anonymous == False and current_user.is_admin == True):
+        admin = True
+    else:
+        admin = False
+    return render_template('home.html', film_dict=dict, is_admin = admin)
 
 #--------------------------------------------------------------------------------------------#
 # Login
@@ -511,3 +518,6 @@ def aggiungi_visualizza_saldo():
 #        #MANCA
 #
 #    else:
+
+if __name__ == "__main__":
+    app.run()

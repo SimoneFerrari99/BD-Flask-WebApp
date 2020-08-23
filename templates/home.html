@@ -1,16 +1,48 @@
 {% extends "main_template.html" %}
 
 {% block pagebody %}
-  <h2>Sei un amministratore?</h2>
-  <input type="button" onclick="location.href='/home_gestione_database';" value="Gestisci database" />
+
+  <style>
+  h3 {
+    display: block;
+    margin-top: 0em;
+    margin-bottom: 1em;
+    margin-left: 1em;
+  }
+  h4 {
+    display: block;
+    margin-top: 0em;
+    margin-bottom: 1em;
+    margin-left: 1.3em;
+  }
+  p {
+    display: block;
+    margin-top: 0em;
+    margin-bottom: 1em;
+    margin-left: 1.3em;
+  }
+  </style>
+
+  {% if is_admin %}
+  <h2>Sei un amministratore!
+    <input type="button" onclick="location.href='/home_gestione_database';" value="Gestisci database" />
+  </h2>
+  {% endif %}
+
 
   <h2>A breve in sala...</h2>
   {% for id_film, elem_list in film_dict.items() %}
-    <img src="static/copertine/{{ id_film }}.jpg" alt="copertina di {{ elem_list[0] }}">
-    <h3 id="titolo">Titolo: {{ elem_list[0] }}</h3>
-    <h4 id="durata">Durata: {{ elem_list[1] }} minuti</h4>
-    <p id="descrizione">{{ elem_list[2] }}</p>
-  {% endfor %}
+    <div style="float:left">
+      <img src="static/copertine/{{ id_film }}.jpg" height="200" width="150" alt="copertina di {{ elem_list[0] }}">
+    </div>
+    <div style="float:left">
+      <h3 id="titolo">Titolo: {{ elem_list[0] }}</h3>
+      <h4 id="durata">Durata: {{ elem_list[1] }} minuti</h4>
+      <p id="descrizione">{{ elem_list[2] }}</p>
+      <h3 style="margin-top: 0.5em;" id="prossimaproiezione">Prossima proiezione</h3>
 
+    </div>
+    <div style="clear:both"/>
+  {% endfor %}
 
 {% endblock %}
