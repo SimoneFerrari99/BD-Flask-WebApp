@@ -43,6 +43,12 @@ admin_engine = create_engine("postgres+psycopg2://admin:passwordadmin@localhost/
 meta = MetaData(admin_engine)
 meta.reflect()
 
+#--------------------------------------------------------------------------------------------#
+#--------------------------------------------------------------------------------------------#
+#--------------------------------------------------------------------------------------------#
+#--------------------------------------------------------------------------------------------#
+#--------------------------------------------------------------------------------------------#
+
 #---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---#
 # Funioni utili
 def generate_persone_dict():  # generatore di un dizionario per le persone
@@ -175,11 +181,11 @@ def logout():
 
 #--------------------------------------------------------------------------------------------#
 # HOME PER LA GESTIONE DATABASE
-@app.route('/home_gestione_database')
+@app.route('/home_gestione_sito')
 @login_required
-def home_gestione_database():
+def home_gestione_sito():
     if(current_user.is_admin == True):
-        return render_template('home_gestione_database.html')
+        return render_template('home_gestione_sito.html')
     else:
         return redirect(url_for('login'))
 
@@ -505,9 +511,9 @@ def registrazione():
 
 #--------------------------------------------------------------------------------------------#
 #Visualizzaizone saldo e ricarica protafoglio
-@app.route('/aggiungi_visualizza_saldo', methods=['GET', 'POST'])
+@app.route('/dashboard_account', methods=['GET', 'POST'])
 @login_required
-def aggiungi_visualizza_saldo():
+def dashboard_account():
      if request.method == "POST":
 
          taglio = request.form["taglio"]
@@ -520,7 +526,7 @@ def aggiungi_visualizza_saldo():
          conn = clienti_engine.connect()
          conn.execute(ins,values)
          conn.close()
-         return redirect(url_for('aggiungi_visualizza_saldo'))
+         return redirect(url_for('dashboard_account'))
      else:
          utenti = request.tables['utenti']
          s = select([utenti.c.email, utenti.c.saldo]).where(utenti.c.email == current_user.email)
@@ -533,7 +539,7 @@ def aggiungi_visualizza_saldo():
 
 #--------------------------------------------------------------------------------------------#
 #modifica dei dati
-@app.route('/modifica_sicurezza', methods=['GET', 'POST'])
+@app.route('/modifica_account', methods=['GET', 'POST'])
 @login_required
 def sicurezza():
     if request.method == "POST":
@@ -551,7 +557,7 @@ def sicurezza():
         psw_ceck = bcrypt.check_password_hash(pw_hash, 'psw_new_raw')
 
         if psw_ceck:
-           return render_template('aggiorna_dati_utente.html', errore = True)
+           return render_template('modifica_account.html', errore = True)
         else:
            psw_new_hash = bcrypt.generate_password_hash(psw_new_raw).decode('utf-8')
            ins = utenti.update()
@@ -561,8 +567,32 @@ def sicurezza():
 
            conn.execute(ins)
            conn.close()
-           return render_template('aggiorna_dati_utente.html', errore = False)
+           return render_template('modifica_account.html', errore = False)
     else:
-           return redirect(url_for('aggiungi_visualizza_saldo'))
+           return render_template('modifica_account.html', errore = False)
+
+#--------------------------------------------------------------------------------------------#
+@app.route('/ricarica_saldo', methods=['GET', 'POST'])
+@login_required
+def ricarica_saldo():
+    return render_template('ricarica_saldo.html')
+
+#--------------------------------------------------------------------------------------------#
+@app.route('/prenota_biglietto', methods=['GET', 'POST'])
+@login_required
+def prenota_biglietto():
+    return render_template('prenota_biglietto.html')
+
+#--------------------------------------------------------------------------------------------#
+@app.route('/tutti_i_film', methods=['GET', 'POST'])
+@login_required
+def tutti_i_film():
+    return render_template('tutti_i_film.html')
+
+#--------------------------------------------------------------------------------------------#
+@app.route('/le_mie_prenotazioni', methods=['GET', 'POST'])
+@login_required
+def le_mie_prenotazioni():
+    return render_template('le_mie_prenotazioni.html')
 
 #--------------------------------------------------------------------------------------------#
