@@ -3,6 +3,14 @@
 {% block pagebody %}
 
 	  <script src="{{url_for('static', filename='aggiungi_film.js')}}"></script>
+		{% if errore %}
+			<script>
+			function alertError(messaggio) {
+				alert(messaggio);
+			}
+			alertError({{error_message|tojson}})
+			</script>
+		{% endif %}
     <form method = "post"  autocomplete = "on"  enctype = "multipart/form-data">
 
       <label for = "titolo">Titolo:</label>

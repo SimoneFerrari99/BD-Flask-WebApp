@@ -132,10 +132,9 @@ conn.execute("CREATE ROLE superuser WITH SUPERUSER CREATEDB CREATEROLE LOGIN")
 conn.execute("CREATE ROLE clienti WITH LOGIN")
 conn.execute("CREATE ROLE anonimous WITH LOGIN")
 
-
-
 conn.execute("GRANT SELECT ON ALL TABLES IN SCHEMA public TO clienti")
 conn.execute("GRANT UPDATE ON utenti TO clienti")
+conn.execute("GRANT INSERT ON posti TO clienti")
 
 conn.execute("GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO superuser")
 conn.execute("GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO superuser")

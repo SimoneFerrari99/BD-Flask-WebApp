@@ -5,27 +5,27 @@
   <style>
   h3 {
     display: block;
-    margin-top: 0em;
-    margin-bottom: 1em;
+    margin-top: 0.7em;
+    margin-bottom: 0.5em;
     margin-left: 1em;
   }
   h4 {
     display: block;
     margin-top: 0em;
-    margin-bottom: 1em;
-    margin-left: 1.3em;
+    margin-bottom: 0.5em;
+    margin-left: 1.2em;
   }
   p {
     display: block;
     margin-top: 0em;
     margin-bottom: 1em;
-    margin-left: 1.3em;
+    margin-left: 1.2em;
   }
   </style>
 
   {% if is_admin %}
   <h2>Sei un amministratore!
-    <input type="button" onclick="location.href='/home_gestione_database';" value="Gestisci database" />
+    <input type="button" onclick="location.href='/home_gestione_database';" value="Gestisci il sito" />
   </h2>
   {% endif %}
 
@@ -39,7 +39,9 @@
       <h3 id="titolo">Titolo: {{ elem_list[0] }}</h3>
       <h4 id="durata">Durata: {{ elem_list[1] }} minuti</h4>
       <p id="descrizione">{{ elem_list[2] }}</p>
-      <h3 style="margin-top: 0.5em;" id="prossimaproiezione">Prossima proiezione</h3>
+      <h3 style="margin-top: 1em;" id="prossimaproiezione">Prossima proiezione: [Giorno] [Ora] [Sala]</h3>
+      <input style="margin-left: 1.4em;" type="button" onclick="location.href='/prenota_biglietto';" value="Prenota biglietti per questa proiezione" />
+      <input style="margin-left: 1.4em;" type="button" onclick="location.href='/proiezioni';" value="Vedi altre proiezioni per questo film" />
 
     </div>
     <div style="clear:both"/>

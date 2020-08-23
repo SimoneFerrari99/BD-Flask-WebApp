@@ -13,9 +13,19 @@
 	</head>
 	<body>
 		<nav>
-			<img src="static/immagini/Logo.svg" height="60" width="60"> ArceCity Cinema
-			<img src="static/immagini/user.svg" height="40" width="40"><a href="/login">Accedi</a>
-			<a href="/logout">Logout</a>
+			<div>
+				<div style="float:left; margin-top: 0em;">
+				  <img src="static/immagini/Logo.png" height="100" width="413">
+				</div>
+				<div style="float:right; margin-top: 1em;">
+					<h3>
+						<a href="/login">Login</a>
+						<a style="margin-left: 10px;" href="/logout">Logout</a>
+					  <img style="margin-left: 10px;" align="middle" src="static/immagini/user.svg" height="50" width="50">
+				  </h3>
+				</div>
+				<div style="clear:both"/>
+			</div>
 		</nav>
 		{% block pagebody %} {% endblock %}
 	</body>

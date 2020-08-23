@@ -2,8 +2,8 @@
 # Gruppo: ArceCity
 # Membri: Casarotti Giulio, Ferrari Simone, Trolese Gulio
 
-# File: app.py
-# Descrizione: applicazione principale
+# File: main.py
+# Descrizione: File contenente tutte le route accessibili da un amministratore
 #---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---#
 # Moduli importati
 from flask import Flask, render_template, url_for, redirect, request, session, flash, abort
@@ -14,15 +14,16 @@ from flask_login import LoginManager, UserMixin, login_required, login_user, log
 import json
 from PIL import Image
 
-from user_route import user_app
-from admin_route import admin_app
+#from user_route import user_app
+#from admin_route import admin_app
+
 
 #---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---#
 # Configurazione APP
 
 app = Flask(__name__)
-app.register_blueprint(user_app)
-app.register_blueprint(admin_app)
+#app.register_blueprint(user_app)
+#app.register_blueprint(admin_app)
 bcrypt = Bcrypt(app)  # inizializzo il bycript della app
 
 #settiamo la secret_key per flask login... settata come consigliato nella documentazione di flask_login
@@ -44,8 +45,6 @@ meta.reflect()
 
 #---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---#
 # Funioni utili
-
-
 def generate_persone_dict():  # generatore di un dizionario per le persone
     persone = meta.tables['persone']
     s = select([persone])
@@ -110,7 +109,6 @@ def home():
 
 #--------------------------------------------------------------------------------------------#
 # Login
-
 #classe che rappresenta un nostro utente
 class Utente(UserMixin):
     def __init__(self, email, password, is_admin): #costruttore
@@ -163,57 +161,31 @@ def login():
         return render_template('login.html')
 #--------------------------------------------------------------------------------------------#
 # Logout
-
-
 @app.route('/logout')
 def logout():
     logout_user()
     return redirect(url_for('home'))
 
+
 #--------------------------------------------------------------------------------------------#
-# Registrazione di un nuovo utente
+#--------------------------------------------------------------------------------------------#
+#--------------------------------------------------------------------------------------------#
+#--------------------------------------------------------------------------------------------#
+#--------------------------------------------------------------------------------------------#
 
-
-@app.route('/registrazione', methods=['GET', 'POST'])
-def registrazione():
-    if request.method == 'POST':
-        # prendiamo i dati dal form
-        nome = request.form["nome"]
-        cognome = request.form["cognome"]
-        data_nascita = str(request.form["data_nascita"])
-        email = request.form["email"]
-        psw = request.form["psw"]
-        conferma = request.form["conferma_password"]
-
-        hashed_psw = bcrypt.generate_password_hash(psw).decode('utf-8')  # cripto la password
-
-        # se le due password non corrispondono
-        if(psw != conferma):
-            return render_template('registrazione.html', errore=True)
-        else:
-            # prendiamo la tabella utenti dal metadata tramite reflection
-            utenti = meta.tables['utenti']  # prendo la tabella
-            ins = utenti.insert()  # prendo la insert
-            values = {  # dizionario per i valori
-                'nome': nome,
-                'cognome': cognome,
-                'data_nascita': data_nascita,
-                'email': email,
-                'password': hashed_psw,
-                'is_admin': False,
-                'saldo': 0.0
-            }
-            conn = anonim_engine.connect()  # mi connetto
-            conn.execute(ins, values)  # eseguo l'inserimento con i valori
-            conn.close()
-            return redirect(url_for('login'))  # return
+#--------------------------------------------------------------------------------------------#
+# HOME PER LA GESTIONE DATABASE
+@app.route('/home_gestione_database')
+@login_required
+def home_gestione_database():
+    if(current_user.is_admin == True):
+        return render_template('home_gestione_database.html')
     else:
-        return render_template('registrazione.html', errore=False)
+        return redirect(url_for('login'))
+
 
 #--------------------------------------------------------------------------------------------#
 # Inseriemnto di una persona
-
-
 @app.route('/aggiungi_persona', methods=['GET', 'POST'])
 @login_required
 def aggiungi_persona():
@@ -243,11 +215,12 @@ def aggiungi_persona():
 
 #--------------------------------------------------------------------------------------------#
 # Inserimento di un film
-
 @app.route('/aggiungi_film', methods=['GET', 'POST'])
 @login_required
 def aggiungi_film():
     if(current_user.is_admin == True):
+        dict_p = generate_persone_dict()
+        dict_g = generate_generi_dict()
         if request.method == 'POST':
             # prendiamo i dati dal form
             titolo = request.form["titolo"]
@@ -263,6 +236,31 @@ def aggiungi_film():
             }
 
             id_film = 0
+
+
+            list_attori = []
+            list_registi = []
+            list_generi = []
+
+            for elem in request.form:
+                # se è un attore
+                if "attori" in str(elem):
+                    id_attore = request.form[str(elem)]
+                    if id_attore in list_attori:
+                        return render_template('aggiungi_film.html',  errore = True, error_message="Attenzione, hai scelto lo stesso attore più di una volta.", persone_dict=json.dumps(dict_p), generi_dict=json.dumps(dict_g))
+                    list_attori.append(id_attore)
+                # se è un regista
+                elif "registi" in str(elem):
+                    id_regista = request.form[str(elem)]
+                    if id_regista in list_registi:
+                        return render_template('aggiungi_film.html',  errore = True, error_message="Attenzione, hai scelto lo stesso regista più di una volta.", persone_dict=json.dumps(dict_p), generi_dict=json.dumps(dict_g))
+                    list_registi.append(id_regista)
+                # se è un genere
+                elif "generi" in str(elem):
+                    tipo_genere = request.form[str(elem)]
+                    if tipo_genere in list_generi:
+                        return render_template('aggiungi_film.html', errore = True, error_message="Attenzione, hai scelto lo stesso genere più di una volta.", persone_dict=json.dumps(dict_p), generi_dict=json.dumps(dict_g))
+                    list_generi.append(tipo_genere)
 
             # transazione per prendere l'id dell'ultimo film inserito (Ovvero quello che stiamo per inserire)
             # Questa transazione serve perchè, una voltas inserito il film, abbiamo bisogno
@@ -291,7 +289,6 @@ def aggiungi_film():
             attori = meta.tables["attori"]
             registi = meta.tables["registi"]
             genere_film = meta.tables["genere_film"]
-
 
             # per ogni elemento del form (non so quanti siano di preciso...)
             for elem in request.form:
@@ -330,15 +327,12 @@ def aggiungi_film():
             conn.close()
             return redirect(url_for('aggiungi_film'))
         else:
-            dict_p = generate_persone_dict()
-            dict_g = generate_generi_dict()
-            return render_template('aggiungi_film.html', persone_dict=json.dumps(dict_p), generi_dict=json.dumps(dict_g))
+            return render_template('aggiungi_film.html', errore = False, error_message="", persone_dict=json.dumps(dict_p), generi_dict=json.dumps(dict_g))
     else:
         return redirect(url_for('login')) # TODO: inserire messaggio di errore
 
 #--------------------------------------------------------------------------------------------#
 # Inseriemnto di un amministratore (da parte di un amministratore)
-
 @app.route('/aggiungi_admin', methods=['GET', 'POST'])
 @login_required
 def aggiungi_admin():
@@ -353,6 +347,12 @@ def aggiungi_admin():
             psw = request.form["psw"]
             conferma = request.form["conferma_password"]
 
+            utenti = meta.tables['utenti']  # prendo la tabella
+            s = select(utenti.c.email).where(utenti.c.email == email)
+
+            if result.rowcount > 0:
+                return render_template('aggiungi_admin.html', errore=False)
+
             hashed_psw = bcrypt.generate_password_hash(psw).decode('utf-8')  # cripto la password
 
             # se le due password non corrispondono
@@ -360,7 +360,6 @@ def aggiungi_admin():
                 return render_template('aggiungi_admin.html', errore=True)
             else:
                 # prendiamo la tabella utenti dal metadata tramite reflection
-                utenti = meta.tables['utenti']  # prendo la tabella
                 ins = utenti.insert()  # prendo la insert
                 values = {  # dizionario per i valori
                     'nome': nome,
@@ -382,8 +381,6 @@ def aggiungi_admin():
 
 #--------------------------------------------------------------------------------------------#
 # Inseriemnto di una sala
-
-
 @app.route('/riepilogo_sale', methods=['GET', 'POST'])
 @login_required
 def riepilogo_sale():
@@ -406,8 +403,6 @@ def riepilogo_sale():
         return redirect(url_for('login')) # TODO: inserire messaggio di errore
 #--------------------------------------------------------------------------------------------#
 # Inseriemnto di una proiezione
-
-
 @app.route('/aggiungi_proiezione', methods=['GET', 'POST'])
 @login_required
 def aggiungi_proiezione():
@@ -439,10 +434,9 @@ def aggiungi_proiezione():
             return render_template('aggiungi_proiezione.html', film_dict=generate_film_dict(), sale=json.dumps(generate_sale_list()))
     else:
         return redirect(url_for('login')) # TODO: inserire messaggio di errore
+
 #--------------------------------------------------------------------------------------------#
 # Inserimento di un genere
-
-
 @app.route('/aggiungi_genere', methods=['GET', 'POST'])
 @login_required
 def aggiungi_genere():
@@ -466,20 +460,51 @@ def aggiungi_genere():
         return redirect(url_for('login')) # TODO: inserire messaggio di errore
 
 #--------------------------------------------------------------------------------------------#
-# HOME PER LA GESTIONE DATABASE
-
-
-@app.route('/home_gestione_database')
-@login_required
-def home_gestione_database():
-    if(current_user.is_admin == True):
-        return render_template('home_gestione_database.html')
-    else:
-        return redirect(url_for('login'))
-
-
+#--------------------------------------------------------------------------------------------#
+#--------------------------------------------------------------------------------------------#
+#--------------------------------------------------------------------------------------------#
 #--------------------------------------------------------------------------------------------#
 
+#--------------------------------------------------------------------------------------------#
+# Registrazione di un nuovo utente
+@app.route('/registrazione', methods=['GET', 'POST'])
+def registrazione():
+    if request.method == 'POST':
+        # prendiamo i dati dal form
+        nome = request.form["nome"]
+        cognome = request.form["cognome"]
+        data_nascita = str(request.form["data_nascita"])
+        email = request.form["email"]
+        psw = request.form["psw"]
+        conferma = request.form["conferma_password"]
+
+        hashed_psw = bcrypt.generate_password_hash(psw).decode('utf-8')  # cripto la password
+
+        # se le due password non corrispondono
+        if(psw != conferma):
+            return render_template('registrazione.html', errore=True)
+        else:
+            # prendiamo la tabella utenti dal metadata tramite reflection
+            utenti = meta.tables['utenti']  # prendo la tabella
+            ins = utenti.insert()  # prendo la insert
+            values = {  # dizionario per i valori
+                'nome': nome,
+                'cognome': cognome,
+                'data_nascita': data_nascita,
+                'email': email,
+                'password': hashed_psw,
+                'is_admin': False,
+                'saldo': 0.0
+            }
+            conn = anonim_engine.connect()  # mi connetto
+            conn.execute(ins, values)  # eseguo l'inserimento con i valori
+            conn.close()
+            return redirect(url_for('login'))  # return
+    else:
+        return render_template('registrazione.html', errore=False)
+
+#--------------------------------------------------------------------------------------------#
+#Visualizzaizone saldo e ricarica protafoglio
 @app.route('/aggiungi_visualizza_saldo', methods=['GET', 'POST'])
 @login_required
 def aggiungi_visualizza_saldo():
@@ -502,22 +527,42 @@ def aggiungi_visualizza_saldo():
 
          conn = clienti_engine.connect()
          conn.execute(s)
-         patrimonio = result.fetchone()
+         patrimonio = result.fetchone()["saldo"]
          conn.close()
          return render_template('dashboard_account.html', saldo = patrimonio)
 
 #--------------------------------------------------------------------------------------------#
+#modifica dei dati
+@app.route('/modifica_sicurezza', methods=['GET', 'POST'])
+@login_required
+def sicurezza():
+    if request.method == "POST":
+        utenti = meta.tables["utenti"]
+        s = select(utenti).where(utenti.c.email == current_user.email)
 
-#@app.route('modifica_sicurezza', methods=['GET', 'POST'])
-#@login_required
-#def sicurezza():
-#    if request.method == "POST":
-#
-#        nome = meta.tables['utenti']
-#        email = meta.tables['utenti']
-#        #MANCA
-#
-#    else:
+        conn = clienti_engine.connect()
+        result = conn.execute(s)
 
-if __name__ == "__main__":
-    app.run()
+        nome = result.fetchone()["nome"]
+        email = result.fetchone()["email"]
+        psw_old = result.fetchone()["password"]
+
+        psw_new_raw = meta.tables["psw"]
+        psw_ceck = bcrypt.check_password_hash(pw_hash, 'psw_new_raw')
+
+        if psw_ceck:
+           return render_template('aggiorna_dati_utente.html', errore = True)
+        else:
+           psw_new_hash = bcrypt.generate_password_hash(psw_new_raw).decode('utf-8')
+           ins = utenti.update()
+           values = {
+               'password' : psw_new_hash
+           }
+
+           conn.execute(ins)
+           conn.close()
+           return render_template('aggiorna_dati_utente.html', errore = False)
+    else:
+           return redirect(url_for('aggiungi_visualizza_saldo'))
+
+#--------------------------------------------------------------------------------------------#
