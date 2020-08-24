@@ -27,14 +27,7 @@
   <input style="margin-left: 1.4em;" type="button" onclick="location.href='/le_mie_prenotazioni';" value="Le mie prenotazioni" />
   <input style="margin-left: 1.4em;" type="button" onclick="location.href='/dashboard_account';" value="Il mio account" />
 
-  {% if is_admin %}
-  <h2>Sei un amministratore!
-    <input type="button" onclick="location.href='/home_gestione_sito';" value="Gestisci il sito" />
-  </h2>
-  {% endif %}
-
-
-  <h2>A breve in sala...</h2>
+  <h2>Lista di tutti i film disponibili nel nostro cinema!</h2>
   {% for id_film, elem_list in film_dict.items() %}
     <div style="float:left">
       <img src="static/copertine/{{ id_film }}.jpg" height="200" width="150" alt="copertina di {{ elem_list[0] }}">

@@ -1,0 +1,49 @@
+{% extends "main_template.html" %}
+
+{% block pagebody %}
+<style>
+  h3 {
+    display: block;
+    margin-top: 0.7em;
+    margin-bottom: 0.5em;
+    margin-left: 1em;
+  }
+  h4 {
+    display: block;
+    margin-top: 0em;
+    margin-bottom: 0.5em;
+    margin-left: 1.2em;
+  }
+  p {
+    display: block;
+    margin-top: 0em;
+    margin-bottom: 1em;
+    margin-left: 1.2em;
+  }
+</style>
+
+
+<input style="margin-left: 1.4em;" type="button" onclick="location.href='/tutti_i_film';" value="Vedi tutti i film" />
+<input style="margin-left: 1.4em;" type="button" onclick="location.href='/le_mie_prenotazioni';" value="Le mie prenotazioni" />
+<input style="margin-left: 1.4em;" type="button" onclick="location.href='/dashboard_account';" value="Il mio account" />
+
+<h2>Le tue prenotazioni</h2>
+{% for id_film, elem_list in film_dict.items() %}
+  <div style="float:left">
+    <img src="static/copertine/{{ id_film }}.jpg" height="200" width="150" alt="copertina di {{ elem_list[0] }}">
+  </div>
+  <div style="float:left">
+    <h3 id="titolo">Titolo: {{ elem_list[0] }}</h3>
+    <h4 id="durata">Durata: {{ elem_list[1] }} minuti</h4>
+    <p id="descrizione">{{ elem_list[2] }}</p>
+    <h3 style="margin-top: 1em;" id="Proiezione">Proiezione: [Giorno] [Ora] [Sala]</h3>
+    <h4 style="margin-top: 1em;" id="NumBiglietti">Numero di biglietti prenotati: [numBiglietti]</h4>
+
+    <input style="margin-left: 1.4em;" type="button" onclick="location.href='/prenota_biglietto';" value="Prenota altri biglietti per questa proiezione" />
+    <input style="margin-left: 1.4em;" type="button" onclick="location.href='/annulla_prenotazione';" value="Annulla prenotazione" />
+
+  </div>
+  <div style="clear:both"/>
+{% endfor %}
+
+{% endblock %}

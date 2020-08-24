@@ -2,7 +2,7 @@
 # Gruppo: ArceCity
 # Membri: Casarotti Giulio, Ferrari Simone, Trolese Gulio
 
-# File: main.py
+# File: app.py
 # Descrizione: File contenente tutte le route accessibili da un amministratore
 #---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---#
 # Moduli importati
@@ -185,7 +185,7 @@ def logout():
 @login_required
 def home_gestione_sito():
     if(current_user.is_admin == True):
-        return render_template('home_gestione_sito.html')
+        return render_template('AdminTemplate/home_gestione_sito.html')
     else:
         return redirect(url_for('login'))
 
@@ -215,7 +215,7 @@ def aggiungi_persona():
             else:
                 return redirect(url_for('aggiungi_persona'))
         else:
-            return render_template('aggiungi_persona.html')
+            return render_template('AdminTemplate/aggiungi_persona.html')
     else:
         return redirect(url_for('login')) # TODO: inserire messaggio di errore
 
@@ -259,13 +259,13 @@ def aggiungi_film():
                 elif "registi" in str(elem):
                     id_regista = request.form[str(elem)]
                     if id_regista in list_registi:
-                        return render_template('aggiungi_film.html',  errore = True, error_message="Attenzione, hai scelto lo stesso regista più di una volta.", persone_dict=json.dumps(dict_p), generi_dict=json.dumps(dict_g))
+                        return render_template('AdminTemplate/aggiungi_film.html',  errore = True, error_message="Attenzione, hai scelto lo stesso regista più di una volta.", persone_dict=json.dumps(dict_p), generi_dict=json.dumps(dict_g))
                     list_registi.append(id_regista)
                 # se è un genere
                 elif "generi" in str(elem):
                     tipo_genere = request.form[str(elem)]
                     if tipo_genere in list_generi:
-                        return render_template('aggiungi_film.html', errore = True, error_message="Attenzione, hai scelto lo stesso genere più di una volta.", persone_dict=json.dumps(dict_p), generi_dict=json.dumps(dict_g))
+                        return render_template('AdminTemplate/aggiungi_film.html', errore = True, error_message="Attenzione, hai scelto lo stesso genere più di una volta.", persone_dict=json.dumps(dict_p), generi_dict=json.dumps(dict_g))
                     list_generi.append(tipo_genere)
 
             # transazione per prendere l'id dell'ultimo film inserito (Ovvero quello che stiamo per inserire)
@@ -333,7 +333,7 @@ def aggiungi_film():
             conn.close()
             return redirect(url_for('aggiungi_film'))
         else:
-            return render_template('aggiungi_film.html', errore = False, error_message="", persone_dict=json.dumps(dict_p), generi_dict=json.dumps(dict_g))
+            return render_template('AdminTemplate/aggiungi_film.html', errore = False, error_message="", persone_dict=json.dumps(dict_p), generi_dict=json.dumps(dict_g))
     else:
         return redirect(url_for('login')) # TODO: inserire messaggio di errore
 
@@ -357,13 +357,13 @@ def aggiungi_admin():
             s = select(utenti.c.email).where(utenti.c.email == email)
 
             if result.rowcount > 0:
-                return render_template('aggiungi_admin.html', errore=False)
+                return render_template('AdminTemplate/aggiungi_admin.html', errore=False)
 
             hashed_psw = bcrypt.generate_password_hash(psw).decode('utf-8')  # cripto la password
 
             # se le due password non corrispondono
             if(psw != conferma):
-                return render_template('aggiungi_admin.html', errore=True)
+                return render_template('AdminTemplate/aggiungi_admin.html', errore=True)
             else:
                 # prendiamo la tabella utenti dal metadata tramite reflection
                 ins = utenti.insert()  # prendo la insert
@@ -381,7 +381,7 @@ def aggiungi_admin():
                 conn.close()
                 return redirect(url_for('login'))  # return
         else:
-            return render_template('aggiungi_admin.html', errore=False)
+            return render_template('AdminTemplate/aggiungi_admin.html', errore=False)
     else:
         return redirect(url_for('login')) # TODO: inserire messaggio di errore
 
@@ -404,7 +404,7 @@ def riepilogo_sale():
             conn.close()
             return redirect(url_for('riepilogo_sale'))  # return
         else:
-            return render_template('riepilogo_sale.html', sale=generate_sale_list())
+            return render_template('AdminTemplate/riepilogo_sale.html', sale=generate_sale_list())
     else:
         return redirect(url_for('login')) # TODO: inserire messaggio di errore
 #--------------------------------------------------------------------------------------------#
@@ -437,7 +437,7 @@ def aggiungi_proiezione():
             conn.close()
             return redirect(url_for('aggiungi_proiezione'))
         else:
-            return render_template('aggiungi_proiezione.html', film_dict=generate_film_dict(), sale=json.dumps(generate_sale_list()))
+            return render_template('AdminTemplate/aggiungi_proiezione.html', film_dict=generate_film_dict(), sale=json.dumps(generate_sale_list()))
     else:
         return redirect(url_for('login')) # TODO: inserire messaggio di errore
 
@@ -461,7 +461,7 @@ def aggiungi_genere():
             conn.close()
             return redirect(url_for('aggiungi_film'))  # return
         else:
-            return render_template('aggiungi_genere.html')
+            return render_template('AdminTemplate/aggiungi_genere.html')
     else:
         return redirect(url_for('login')) # TODO: inserire messaggio di errore
 
@@ -535,11 +535,11 @@ def dashboard_account():
          conn.execute(s)
          patrimonio = result.fetchone()["saldo"]
          conn.close()
-         return render_template('dashboard_account.html', saldo = patrimonio)
+         return render_template('UserTemplate/dashboard_account.html', saldo = patrimonio)
 
 #--------------------------------------------------------------------------------------------#
 #modifica dei dati
-@app.route('/modifica_account', methods=['GET', 'POST'])
+@app.route('/cambia_password', methods=['GET', 'POST'])
 @login_required
 def sicurezza():
     if request.method == "POST":
@@ -557,7 +557,7 @@ def sicurezza():
         psw_ceck = bcrypt.check_password_hash(pw_hash, 'psw_new_raw')
 
         if psw_ceck:
-           return render_template('modifica_account.html', errore = True)
+           return render_template('UserTemplate/modifica_account.html', errore = True)
         else:
            psw_new_hash = bcrypt.generate_password_hash(psw_new_raw).decode('utf-8')
            ins = utenti.update()
@@ -567,32 +567,44 @@ def sicurezza():
 
            conn.execute(ins)
            conn.close()
-           return render_template('modifica_account.html', errore = False)
+           return render_template('UserTemplate/cambia_password.html', errore = False)
     else:
-           return render_template('modifica_account.html', errore = False)
+           return render_template('UserTemplate/cambia_password.html', errore = False)
 
 #--------------------------------------------------------------------------------------------#
 @app.route('/ricarica_saldo', methods=['GET', 'POST'])
 @login_required
 def ricarica_saldo():
-    return render_template('ricarica_saldo.html')
+    return render_template('UserTemplate/ricarica_saldo.html')
 
 #--------------------------------------------------------------------------------------------#
 @app.route('/prenota_biglietto', methods=['GET', 'POST'])
 @login_required
 def prenota_biglietto():
-    return render_template('prenota_biglietto.html')
+    return render_template('UserTemplate/prenota_biglietto.html')
+
+@app.route('/annulla_prenotazione', methods=['GET', 'POST'])
+@login_required
+def annulla_prenotazione():
+    return render_template('UserTemplate/annulla_prenotazione.html')
 
 #--------------------------------------------------------------------------------------------#
-@app.route('/tutti_i_film', methods=['GET', 'POST'])
+@app.route('/tutti_i_film')
 @login_required
 def tutti_i_film():
-    return render_template('tutti_i_film.html')
+    dict = generate_film_dict()
+    return render_template('UserTemplate/tutti_i_film.html', film_dict=dict)
 
+@app.route('/tutte_le_proiezioni')
+@login_required
+def tutte_le_proiezioni():
+    dict = generate_film_dict()
+    return render_template('UserTemplate/tutte_le_proiezioni.html', film_dict=dict)
 #--------------------------------------------------------------------------------------------#
 @app.route('/le_mie_prenotazioni', methods=['GET', 'POST'])
 @login_required
 def le_mie_prenotazioni():
-    return render_template('le_mie_prenotazioni.html')
+    dict = generate_film_dict()
+    return render_template('UserTemplate/le_mie_prenotazioni.html', film_dict=dict)
 
 #--------------------------------------------------------------------------------------------#
