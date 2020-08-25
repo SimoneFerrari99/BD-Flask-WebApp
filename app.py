@@ -631,7 +631,7 @@ def cambia_password():
            return render_template('UserTemplate/cambia_password.html', errore=True, error_message="Attenzione, le due nuove password non combaciano. Prego reinserire correttamente i dati")
         elif old_psw == psw:
            conn.close()
-           return render_template('UserTemplate/cambia_password.html', errore=True, error_message="Attenzione, le la vecchia e la nuova password combaciano. Prego reinserire password diverse")
+           return render_template('UserTemplate/cambia_password.html', errore=True, error_message="Attenzione, la vecchia e la nuova password combaciano. Prego reinserire password diverse")
         else:
            psw_new_hash = bcrypt.generate_password_hash(psw).decode('utf-8')
            ins = utenti.update().where(utenti.c.email == current_user.email)
