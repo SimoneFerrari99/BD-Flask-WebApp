@@ -609,32 +609,39 @@ def dashboard_account():
 @login_required
 def cambia_password():
     if request.method == "POST":
+
+        old_psw = request.form["old_psw"]
+        psw = request.form["psw"]
+        conferma = request.form["conferma_password"]
+
         utenti = meta.tables["utenti"]
-        s = select(utenti).where(utenti.c.email == current_user.email)
+        #s = select([utenti]).where(utenti.c.email == current_user.email)
 
         conn = clienti_engine.connect()
-        result = conn.execute(s)
-        row = result.fetchone()
+        #result = conn.execute(s)
+        #vecchia = result.fetchone()
 
-        nome = row["nome"].capitalize()
-        email = row["email"]
-        psw_old = row["password"]
+        #psw_new_raw = meta.tables["psw"]
+        psw_ceck = bcrypt.check_password_hash(current_user.password, old_psw)
 
-        psw_new_raw = meta.tables["psw"]
-        psw_ceck = bcrypt.check_password_hash(pw_hash, 'psw_new_raw')
-
-        if psw_ceck:
-           return render_template('UserTemplate/cambia_password.html', errore = True)  #Messaggio di errore da inviare all'utente
+        if psw_ceck == False:
+           return render_template('UserTemplate/cambia_password.html', errore=True, error_message="Errore: password vecchia errata!")  #Messaggio di errore da inviare all'utente
+        elif psw != conferma:
+           conn.close()
+           return render_template('UserTemplate/cambia_password.html', errore=True, error_message="Attenzione, le due nuove password non combaciano. Prego reinserire correttamente i dati")
+        elif old_psw == psw:
+           conn.close()
+           return render_template('UserTemplate/cambia_password.html', errore=True, error_message="Attenzione, le la vecchia e la nuova password combaciano. Prego reinserire password diverse")
         else:
-           psw_new_hash = bcrypt.generate_password_hash(psw_new_raw).decode('utf-8')
-           ins = utenti.update()
+           psw_new_hash = bcrypt.generate_password_hash(psw).decode('utf-8')
+           ins = utenti.update().where(utenti.c.email == current_user.email)
            values = {
                'password' : psw_new_hash
            }
 
-           conn.execute(ins)
+           conn.execute(ins, values)
            conn.close()
-           return render_template('UserTemplate/cambia_password.html', errore = False)
+           return redirect(url_for('dashboard_account'))
     else:
            return render_template('UserTemplate/cambia_password.html', errore = False)
 
@@ -643,16 +650,16 @@ def cambia_password():
 @login_required
 def ricarica_saldo():
     utenti = meta.tables['utenti']
-    s = select(utenti).where(utenti.c.email == current_user.email)
+    s = select([utenti]).where(utenti.c.email == current_user.email)
     conn = clienti_engine.connect()
     result = conn.execute(s)
     saldo = result.fetchone()["saldo"]
 
     if request.method == "POST":
         taglio = request.form["taglio"]
-        ins = genere.update();
+        ins = utenti.update().where(utenti.c.email == current_user.email);
         values = {
-            'saldo' : saldo + taglio
+            'saldo' : saldo + float(taglio)
         }
 
         conn.execute(ins,values)
