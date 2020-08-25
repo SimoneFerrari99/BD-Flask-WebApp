@@ -1,0 +1,26 @@
+{% extends "main_template.html" %}
+
+{% block pagebody %}
+
+  {% if errore %}
+    <script>
+    function alertError(messaggio) {
+      alert(messaggio);
+    }
+    alertError({{error_message|tojson}})
+    </script>
+  {% endif %}
+
+  <form method="POST">
+
+    <label for = "film">Scegli il film che vuoi eliminare:</label>
+    <select name="film" id="film">
+      {% for id_film, titolo in film_dict.items() %}
+      <option value={{id_film}}>{{titolo[0]}}</option>
+      {% endfor %}
+    </select><br>
+
+    <button type = "submit" name = "Submit" value = "Rimuovi">Rimuovi Film
+  </form>
+
+{% endblock %}

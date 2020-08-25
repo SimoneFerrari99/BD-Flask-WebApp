@@ -1,16 +1,23 @@
 {% extends "main_template.html" %}
 
 {% block pagebody %}
+<style>
+h3 {
+  display: block;
+  margin-top: 0em;
+  margin-bottom: 0.5em;
+}
+</style>
 
 <form action = "/ricarica_saldo" method="POST">
-  <label for = "saldo">Saldo: €{{ saldo }}
+  <h3>Saldo: €{{ saldo }}<h3>
   <label for = "taglio">Scegli il taglio da ricaricare</label>
   <select name = "taglio" id = "taglio">
     <option value = "5">5</option>
     <option value = "10">10</option>
     <option value = "20">20</option>
     <option value = "40">40</option>
-    <option value = "tua_madre">Tua madre</option>
+    <option value = "tua_madre">Tua madre sporca dura</option>
     <option value = "50">50</option>
   </select>
   <input type = "submit" value = "Aggiungi">

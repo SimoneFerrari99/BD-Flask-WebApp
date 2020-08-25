@@ -1,15 +1,30 @@
 {% extends "main_template.html" %}
 
 {% block pagebody %}
+<style>
+h2 {
+  display: block;
+  margin-top: 1em;
+  margin-bottom: 0.5em;
+}
+h3 {
+  display: block;
+  margin-top: 0em;
+  margin-bottom: 0.5em;
+}
+</style>
 
-<form action = "/dashboard_account" method="POST">
 
-  <label for = "saldo">Saldo: €{{ saldo }}</label>
-  <button type = "button" value = "ricarica_saldo">Ricarica Saldo</button>
-  <label for = "nome">Nome: {{ nome }}</label>
-  <label for = "cognome">Cognome: {{cognome}}</label>
-  <button type = "button" value = "modifica_psw">Modifica password</button>
 
-</form>
+  <h2>{{ nome }} {{cognome}}</h2>
+  <h3>{{ email }}</h3>
+
+  <h3>Saldo: €{{ saldo }}
+    <button type = "button" onclick="location.href='/ricarica_saldo';" value = "ricarica_saldo">Ricarica Saldo</button>
+  </h3>
+
+  <br><br>
+
+  <button type = "button" onclick="location.href='/cambia_password';" value = "modifica_psw">Modifica password</button>
 
 {% endblock %}

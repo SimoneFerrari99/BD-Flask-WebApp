@@ -21,7 +21,7 @@ from PIL import Image
 #---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---#
 # Configurazione APP
 
-app = Flask(__name__, static_folder='/home/giulio/Scrivania/progettoBasi/static')
+app = Flask(__name__)
 #app.register_blueprint(user_app)
 #app.register_blueprint(admin_app)
 bcrypt = Bcrypt(app)  # inizializzo il bycript della app
@@ -100,6 +100,9 @@ def generate_sale_list():  # generatore di un dizionario per le sale
         list_sale.append(row['n_sala'])
     conn.close()
     return list_sale
+
+def generate_proiezioni_valide_dict():
+    return None
 
 def errore_admin():
     return redirect(url_for('login', errore = True, messaggio="Attenzione, solo gli amministratori sono autorizzati ad accedere a questa pagina."))
@@ -453,7 +456,7 @@ def aggiungi_genere():
             tipo = request.form["tipo"]
 
             genere = meta.tables['genere']  # prendo la tabella
-            
+
             s = select([genere]).where(
                 genere.c.tipo == tipo
             )
@@ -476,6 +479,54 @@ def aggiungi_genere():
             return render_template('AdminTemplate/aggiungi_genere.html', errore = False)
     else:
         return errore_admin()
+
+@app.route('/rimuovi_film', methods=['GET', 'POST'])
+@login_required
+def rimuovi_film():
+    if(current_user.is_admin == True):
+        if request.method == 'POST':
+            if "film" in request.form:
+                # prendiamo i dati dal form
+                id_film = request.form["film"]
+
+                film = meta.tables["film"]  # prendo la tabella
+
+                rem = film.delete().where(film.c.id_film == id_film)
+                conn = admin_engine.connect()  # mi connetto
+                conn.execute(rem)  # eseguo l'inserimento con i valori
+                conn.close()
+                return render_template('AdminTemplate/rimuovi_film.html', film_dict = generate_film_dict(), errore = False)
+            else:
+                return render_template('AdminTemplate/rimuovi_film.html', errore = True, error_message="Errore, stai provando a rimuovere una proiezione che non esiste", film_dict = generate_film_dict())
+        else:
+            return render_template('AdminTemplate/rimuovi_film.html', film_dict = generate_film_dict(), errore = False)
+    else:
+        return errore_admin()
+
+@app.route('/rimuovi_proiezione', methods=['GET', 'POST'])
+@login_required
+def rimuovi_proiezione():
+    if(current_user.is_admin == True):
+        if request.method == 'POST':
+            if "film" in request.form:
+                # prendiamo i dati dal form
+                id_film = request.form["film"]
+
+                film = meta.tables["film"]  # prendo la tabella
+
+                rem = film.delete().where(film.c.id_film == id_film)
+                conn = admin_engine.connect()  # mi connetto
+                conn.execute(rem)  # eseguo l'inserimento con i valori
+                conn.close()
+                return render_template('AdminTemplate/rimuovi_film.html', film_dict = generate_film_dict(), errore = False)
+            else:
+                return render_template('AdminTemplate/rimuovi_film.html', errore = True, error_message="Errore, stai provando a rimuovere un film che non esiste", film_dict = generate_film_dict())
+        else:
+            return render_template('AdminTemplate/rimuovi_film.html', film_dict = generate_film_dict(), errore = False)
+    else:
+        return errore_admin()
+
+
 
 #--------------------------------------------------------------------------------------------#
 #--------------------------------------------------------------------------------------------#
@@ -537,33 +588,37 @@ def registrazione():
 def dashboard_account():
 
          utenti = meta.tables['utenti']
-         s = select([utenti.c.saldo]).where(utenti.c.email == current_user.email)
+         s = select([utenti]).where(utenti.c.email == current_user.email)
 
          conn = clienti_engine.connect()
          result = conn.execute(s)
+         row = result.fetchone()
 
-         portafoglio = result.fetchone()["saldo"]
-         name = result.fetchone()["nome"]
-         surname = result.fetchone()["cognome"]
+         portafoglio = row["saldo"]
+         name = row["nome"].capitalize()
+         surname = row["cognome"].capitalize()
+         email = row["email"]
+
 
          conn.close()
-         return render_template('UserTemplate/dashboard_account.html', saldo = portafoglio, nome = name, cognome = surname)
+         return render_template('UserTemplate/dashboard_account.html', saldo = portafoglio, nome = name, cognome = surname, email = email)
 
 #--------------------------------------------------------------------------------------------#
 #modifica dei dati
 @app.route('/cambia_password', methods=['GET', 'POST'])
 @login_required
-def sicurezza():
+def cambia_password():
     if request.method == "POST":
         utenti = meta.tables["utenti"]
         s = select(utenti).where(utenti.c.email == current_user.email)
 
         conn = clienti_engine.connect()
         result = conn.execute(s)
+        row = result.fetchone()
 
-        nome = result.fetchone()["nome"]
-        email = result.fetchone()["email"]
-        psw_old = result.fetchone()["password"]
+        nome = row["nome"].capitalize()
+        email = row["email"]
+        psw_old = row["password"]
 
         psw_new_raw = meta.tables["psw"]
         psw_ceck = bcrypt.check_password_hash(pw_hash, 'psw_new_raw')
@@ -605,7 +660,7 @@ def ricarica_saldo():
         return redirect(url_for('dashboard_account'))
 
     else:
-        return render_template('UserTemplate/ricarica_saldo.html', )
+        return render_template('UserTemplate/ricarica_saldo.html', saldo = saldo)
 
 #--------------------------------------------------------------------------------------------#
 @app.route('/prenota_biglietto', methods=['GET', 'POST'])
