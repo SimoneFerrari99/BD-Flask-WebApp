@@ -1,5 +1,14 @@
 {% extends "main_template.html" %} {% block pagebody %}
 
+{% if error == "True" %}
+	<script>
+	function alertError(messaggio) {
+		alert(messaggio);
+	}
+	alertError({{error_message|tojson}})
+	</script>
+{% endif %}
+
 <form method="post">
 	<label for="email">Email:</label>
 	<input type="text" name="email" id="email" /><br />

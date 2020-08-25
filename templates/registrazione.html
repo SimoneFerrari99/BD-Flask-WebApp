@@ -2,7 +2,16 @@
 
 {% block pagebody %}
 
-  <form method = "post"  autocomplete = "on" enctype = ”text/plain”>
+  {% if errore %}
+    <script>
+    function alertError(messaggio) {
+      alert(messaggio);
+    }
+    alertError({{error_message|tojson}})
+    </script>
+  {% endif %}
+
+  <form method = "POST"  autocomplete = "on" enctype = ”text/plain”>
 
     <label for = "nome">Nome:</label>
     <input id = "nome" name = "nome" type = "text" autofocus pattern="^[a-zA-Z ']*$" title="inserire un nome valido"><br>
@@ -20,9 +29,6 @@
 
     <label for = "conferma_password">Conferma Password:</label>
     <input id = "conferma_password" name = "conferma_password" type = "password"><br>
-    {% if errore %}
-      <h3>Errore: le password non corrispondono!</h3><br>
-    {% endif %}
     <button type = "submit" name = "Submit" value = "Registrati">Registrati
     <button type = "reset" value = "Reset">Reset
 

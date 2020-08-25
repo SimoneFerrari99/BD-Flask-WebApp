@@ -2,41 +2,14 @@
 
 {% block pagebody %}
 
-<!-- <style>
-      .button {
-      border: none;
-      color: white;
-      padding: 15px 32px;
-      text-align: center;
-      text-decoration: none;
-      display: inline-block;
-      font-size: 16px;
-      margin: 4px 2px;
-      cursor: pointer;
-    }
+<form action = "/dashboard_account" method="POST">
 
-  .button1 {background-color: #4CAF50;}
-  </style>
+  <label for = "saldo">Saldo: €{{ saldo }}</label>
+  <button type = "button" value = "ricarica_saldo">Ricarica Saldo</button>
+  <label for = "nome">Nome: {{ nome }}</label>
+  <label for = "cognome">Cognome: {{cognome}}</label>
+  <button type = "button" value = "modifica_psw">Modifica password</button>
 
-  <form action = "/??????">
-    <button class = "button button1" value = "prenotazioni">Le tue prenotazioni</button>
-    <button class = "button button1" value = "sicurezza">Acesso e impostazioni di sicurezza</button>
-    <button class = "button button1" value = "pagamenti">I tuoi pagamenti</button>
-    <button class = "button button1" value = "buoni_ricarica">Buoni regalo e ricarica account</button>
-    <button class = "button button1" value = "help">Help</button>
-  </form>
--->
-<input style="margin-left: 1.4em;" type="button" onclick="location.href='/tutti_i_film';" value="Vedi tutti i film" />
-<input style="margin-left: 1.4em;" type="button" onclick="location.href='/le_mie_prenotazioni';" value="Le mie prenotazioni" />
-<input style="margin-left: 1.4em;" type="button" onclick="location.href='/dashboard_account';" value="Il mio account" />
-
-<h1> Il mio account</h1>
-<form action = "/???????">
-  <button type = "button" value = "prenotazioni">Le tue prenotazioni</button>
-  <button type = "button" value = "sicurezza">Acesso e impostazioni di sicurezza</button>
-  <button type = "button" value = "pagamenti">I tuoi pagamenti</button>
-  <button type = "button" value = "buoni_ricarica">Buoni regalo e ricarica account</button>
-  <button type = "button" value = "help">Help</button>
 </form>
 
 {% endblock %}

@@ -2,6 +2,15 @@
 
 {% block pagebody %}
 
+{% if errore %}
+	<script>
+	function alertError(messaggio) {
+		alert(messaggio);
+	}
+	alertError({{error_message|tojson}})
+	</script>
+{% endif %}
+
   <form method = "post"  autocomplete = "on" enctype = ”text/plain”>
 
     <label for = "tipo">Tipo:</label>
