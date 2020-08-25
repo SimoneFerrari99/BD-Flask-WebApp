@@ -615,13 +615,8 @@ def cambia_password():
         conferma = request.form["conferma_password"]
 
         utenti = meta.tables["utenti"]
-        #s = select([utenti]).where(utenti.c.email == current_user.email)
-
         conn = clienti_engine.connect()
-        #result = conn.execute(s)
-        #vecchia = result.fetchone()
 
-        #psw_new_raw = meta.tables["psw"]
         psw_ceck = bcrypt.check_password_hash(current_user.password, old_psw)
 
         if psw_ceck == False:
