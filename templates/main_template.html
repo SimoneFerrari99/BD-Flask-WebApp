@@ -12,6 +12,37 @@
 		<link rel="icon" href="static/immagini/Logo.svg" />
 	</head>
 	<body>
+		<script>
+		function getCookie(name) {
+	    var dc = document.cookie;
+	    var prefix = name + "=";
+	    var begin = dc.indexOf("; " + prefix);
+		  if (begin == -1) {
+	        begin = dc.indexOf(prefix);
+	        if (begin != 0) return null;
+		  }
+	    else
+	    {
+	        begin += 2;
+	        var end = document.cookie.indexOf(";", begin);
+	        if (end == -1) {
+	        end = dc.length;
+	        }
+	    }
+	    return decodeURI(dc.substring(begin + prefix.length, end));
+		}
+
+		function readCookie(){
+			let utente = getCookie("userEmail");
+			if(utente != null){
+				utente = utente.replace('"', '');
+				utente = utente.replace('"', '');
+				console.log(utente);
+				scritta = document.getElementById('login');
+				scritta.innerHTML = utente;
+			}
+		}
+		</script>
 		<nav>
 			<div>
 				<div style="float:left; margin-top: 0em;">
@@ -19,7 +50,7 @@
 				</div>
 				<div style="float:right; margin-top: 1em;">
 					<h3>
-						<a href="/login/False/None">Login</a>
+						<a href="/login/False/None" id="login">Login</a>
 						<a style="margin-left: 10px;" href="/logout">Logout</a>
 					  <img style="margin-left: 10px;" align="middle" src="{{url_for('static', filename='immagini/user.svg')}}" height="50" width="50">
 				  </h3>
@@ -28,5 +59,8 @@
 			</div>
 		</nav>
 		{% block pagebody %} {% endblock %}
+		<script>
+			readCookie()
+		</script>
 	</body>
 </html>

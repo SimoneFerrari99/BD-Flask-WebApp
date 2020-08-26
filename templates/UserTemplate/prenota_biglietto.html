@@ -1,5 +1,53 @@
-{% extends "main_template.html" %}
+{% extends "main_template.html" %} {% block pagebody %}
 
-<input style="margin-left: 1.4em;" type="button" onclick="location.href='/tutti_i_film';" value="Vedi tutti i film" />
-<input style="margin-left: 1.4em;" type="button" onclick="location.href='/le_mie_prenotazioni';" value="Le mie prenotazioni" />
-<input style="margin-left: 1.4em;" type="button" onclick="location.href='/dashboard_account';" value="Il mio account" />
+{% if errore%}
+<script>
+	function alertError(messaggio) {
+		alert(messaggio);
+	}
+	alertError({{error_message|tojson}})
+</script>
+{% endif %}
+
+<input
+	style="margin-left: 1.4em;"
+	type="button"
+	onclick="location.href='/tutti_i_film';"
+	value="Vedi tutti i film"
+/>
+<input
+	style="margin-left: 1.4em;"
+	type="button"
+	onclick="location.href='/le_mie_prenotazioni';"
+	value="Le mie prenotazioni"
+/>
+<input
+	style="margin-left: 1.4em;"
+	type="button"
+	onclick="location.href='/dashboard_account';"
+	value="Il mio account"
+/>
+
+<style>
+	.posti {
+		margin: 0;
+		padding: 0;
+		box-sizing: border-box;
+	}
+</style>
+<script src="{{url_for('static', filename='prenota_biglietto.js')}}"></script>
+<br>
+<p id="film">Film: {{titolo}}<br></p>
+<p name="proiezione" id="id_proiezione">Film: {{titolo}}<br></p>
+
+Seleziona i posti a sedere:<br>
+{% for i in range(150) %}
+<button type="button" class="posti" id={{i+1}} onclick="selezionaPosto(id)" style="background-color:green; border:none; padding: 16px; margin-top:10px; border-radius: 8px; outline:none;"></button>
+{% if (i + 1) is divisibleby 15 %}
+<br>
+{% endif %}
+{% endfor %}
+Importo: <div id="importo">0.0</div><br>
+<button type="button" name="invia" onclick="invia()">Invia</button>
+
+{% endblock %}

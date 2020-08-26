@@ -6,10 +6,10 @@
 # Descrizione: File contenente tutte le route accessibili da un amministratore
 #---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---#
 # Moduli importati
-from flask import Flask, render_template, url_for, redirect, request, session, flash, abort
+from flask import Flask, render_template, url_for, redirect, request, session, flash, abort, make_response
 from flask_bcrypt import Bcrypt
 from sqlalchemy import create_engine, MetaData, Table, select
-from sqlalchemy.sql import func
+from sqlalchemy.sql import func, and_, or_, not_
 from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user, current_user
 import json
 from PIL import Image
@@ -107,6 +107,65 @@ def generate_proiezioni_valide_dict():
 def errore_admin():
     return redirect(url_for('login', errore = True, messaggio="Attenzione, solo gli amministratori sono autorizzati ad accedere a questa pagina."))
 
+def generate_my_projection_dict():
+    # SELECT f.titolo, pr.data, pr.ora_inizio, pr.sala, COUNT(*) as NumBiglietti
+    # FROM posti po JOIN proiezioni pr ON po.id_proiezione = pr.id_proiezione JOIN film f ON pr.film = f.id_film
+    # WHERE po.prenotato = current_user.email AND pr.data >= current_date AND pr.ora_inizio >= current_time
+    # GROUP BY pr.id_proiezione
+
+    posti = meta.table['posti']
+    proiezioni = meta.tables['proiezioni']
+    film = meta.tables['film']
+
+    j = posti.join(proiezioni.join(film, proiezioni.c.film == film.c.id_film), posti.c.id_proiezione == proiezioni.c.id_proiezione)
+    s = select([film.c.titolo, proiezioni.c.data, proiezioni.c.ora_inizio, proiezioni.c.sala, func.count().label('num_biglietti')]).\
+        select_from(j).\
+        where(and_(
+                proiezione.prenotato == current_user.email,
+                proiezione.data >= func.current_date(),
+                proiezione.ora_inizio >= func.current_time()
+        )).\
+        group_by(proiezioni.c.id_proiezione)
+
+    conn = clienti_engine.connect()
+    result = conn.execute(s)
+
+    list_all_projection = []
+
+    for row in result: #lista di dizionari
+        dict_projection = dict()
+        dict_projection["titolo"] = [row['titolo']]
+        dict_projection["data"] = [row['data']]
+        dict_projection["ora_inizio"] = [row['ora_inizio']]
+        dict_projection["sala"] = [row['sala']]
+        dict_projection["num_biglietti"] = [row['num_biglietti']]
+        list_all_projection.append(dict_projection)
+
+    conn.close()
+    return list_all_projection
+
+def generate_all_film_next_projection():
+    film = meta.tables['film']
+    proiezione = meta.tables['proiezione']
+    j = film.join(proiezione, film.c.id_film == proiezione.c.film)        #JOIN
+    s = select([film, proiezione]).select_from(j).where(func.current_date() <= proiezione.c.data)
+    conn = clienti_engine.connect()
+    result = conn.execute(s)
+    list_all_film = []
+    for row in result:
+
+        dict_film = dict()
+        dict_film["id_film"] = [row['id_film']]
+        dict_film["titolo"] = [row['titolo']]
+        dict_film["durata"] = [row['durata']]
+        dict_film["id_proiezione"] = [row['id_proiezione']]
+        dict_film["ora_inizio"] = [row['ora_inizio']]
+        dict_film["data"] = [row['data']]
+        dict_film["sala"] = [row['sala']]
+        list_all_film.append(dict_film)
+
+    conn.close()
+    return list_all_film
 
 #---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---#
 # Route principale: Home
@@ -163,7 +222,9 @@ def login(errore, messaggio):
         utente = load_user(email_form)
         if utente != None and bcrypt.check_password_hash(utente.password, password) == True: #se la password salvata nel database e quella inserita nel form coincidono
             login_user(utente) #loggo l'utente
-            return redirect(url_for('home'))
+            resp = make_response(redirect(url_for('home')))
+            resp.set_cookie("userEmail", current_user.email)
+            return resp
         else:
             return redirect(url_for('login', errore = True, messaggio="Attenzione, mail o password errate."))
     else:
@@ -172,8 +233,10 @@ def login(errore, messaggio):
 # Logout
 @app.route('/logout')
 def logout():
+    resp = make_response(redirect(url_for('home')))
+    resp.set_cookie("userEmail", current_user.email, max_age=0)
     logout_user()
-    return redirect(url_for('home'))
+    return resp
 
 
 #--------------------------------------------------------------------------------------------#
@@ -668,14 +731,17 @@ def ricarica_saldo():
 @app.route('/prenota_biglietto', methods=['GET', 'POST'])
 @login_required
 def prenota_biglietto():
-    return render_template('UserTemplate/prenota_biglietto.html')
+    if request.method == "POST":
+        print(request.json)
+        return 'OK', 200
+    else:
+        return render_template('UserTemplate/prenota_biglietto.html', errore = False, titolo = "ciao")
 
 #--------------------------------------------------------------------------------------------#
 @app.route('/tutti_i_film')
 @login_required
 def tutti_i_film():
-    dict_f = generate_film_dict()
-    dict_p = generate_prox_proiection_dict()
+    dict = generate_all_film_next_projection()
     return render_template('UserTemplate/tutti_i_film.html', film_dict=dict_f, proiezioni_dict=dict_p)
 
 #--------------------------------------------------------------------------------------------#
@@ -689,7 +755,7 @@ def tutte_le_proiezioni():
 @app.route('/le_mie_prenotazioni')
 @login_required
 def le_mie_prenotazioni():
-    dict = generate_film_dict()
-    return render_template('UserTemplate/le_mie_prenotazioni.html', film_dict=dict)
+    dict = generate_my_projection_dict();
+    return render_template('UserTemplate/le_mie_prenotazioni.html', projection_dict=dict)
 
 #--------------------------------------------------------------------------------------------#
