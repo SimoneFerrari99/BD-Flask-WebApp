@@ -14,21 +14,21 @@ from flask_login import LoginManager, UserMixin, login_required, login_user, log
 import json
 from PIL import Image
 
-#from user_route import user_app
-#from admin_route import admin_app
+# from user_route import user_app
+# from admin_route import admin_app
 
 
 #---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---#
 # Configurazione APP
 
 app = Flask(__name__)
-#app.register_blueprint(user_app)
-#app.register_blueprint(admin_app)
+# app.register_blueprint(user_app)
+# app.register_blueprint(admin_app)
 bcrypt = Bcrypt(app)  # inizializzo il bycript della app
 
 
-#settiamo la secret_key per flask login... settata come consigliato nella documentazione di flask_login
-#Configuriamo flask login
+# settiamo la secret_key per flask login... settata come consigliato nella documentazione di flask_login
+# Configuriamo flask login
 app.secret_key = b'f^iz\x05~\x1b\xaat\xf7\x00\xb4Lf7\xa0'
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -38,7 +38,7 @@ login_manager.init_app(app)
 anonim_engine = create_engine("postgres+psycopg2://anonim:passwordanonim@localhost/progettobd")
 clienti_engine = create_engine("postgres+psycopg2://cliente:passwordcliente@localhost/progettobd")
 admin_engine = create_engine("postgres+psycopg2://admin:passwordadmin@localhost/progettobd")
-#engine = create_engine("postgres+psycopg2://postgres:simone@localhost/progettobd")
+# engine = create_engine("postgres+psycopg2://postgres:simone@localhost/progettobd")
 
 # prendiamo i metadata dell'engine
 meta = MetaData(admin_engine)
@@ -52,7 +52,8 @@ meta.reflect()
 
 #---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---#
 # Funioni utili
-def generate_persone_dict():  # generatore di un dizionario per le persone
+# generatore di un dizionario per le persone
+def generate_persone_dict():
     persone = meta.tables['persone']
     s = select([persone])
     conn = anonim_engine.connect()
@@ -63,8 +64,8 @@ def generate_persone_dict():  # generatore di un dizionario per le persone
     conn.close()
     return dict_persone
 
-
-def generate_film_dict():  # generatore di un dizionario per i film
+ # generatore di un dizionario per i film
+def generate_film_dict():
     film = meta.tables['film']
     s = select([film])
     conn = anonim_engine.connect()
@@ -76,21 +77,20 @@ def generate_film_dict():  # generatore di un dizionario per i film
     conn.close()
     return dict_film
 
-
-def generate_generi_dict():  # generatore di un dizionario per i generi
+# generatore di un dizionario per i generi
+def generate_generi_dict():
     genere = meta.tables['genere']
     s = select([genere])
     conn = anonim_engine.connect()
     result = conn.execute(s)
     dict_generi = dict()
     for row in result:
-        dict_generi[row['tipo']] = [
-            row['tipo']]
+        dict_generi[row['tipo']] = [row['tipo']]
     conn.close()
     return dict_generi
 
-
-def generate_sale_list():  # generatore di un dizionario per le sale
+# generatore di un dizionario per le sale
+def generate_sale_list():
     sale = meta.tables['sale']
     s = select([sale])
     conn = anonim_engine.connect()
@@ -101,29 +101,38 @@ def generate_sale_list():  # generatore di un dizionario per le sale
     conn.close()
     return list_sale
 
+
 def generate_proiezioni_valide_dict():
     return None
 
-def errore_admin():
-    return redirect(url_for('login', errore = True, messaggio="Attenzione, solo gli amministratori sono autorizzati ad accedere a questa pagina."))
 
+def errore_admin():
+    return redirect(url_for('login', errore=True, messaggio="Attenzione, solo gli amministratori sono autorizzati ad accedere a questa pagina."))
+
+# Genera una lista contenente tutte le mie proiezioni
 def generate_my_projection_dict():
     # SELECT f.titolo, pr.data, pr.ora_inizio, pr.sala, COUNT(*) as NumBiglietti
     # FROM posti po JOIN proiezioni pr ON po.id_proiezione = pr.id_proiezione JOIN film f ON pr.film = f.id_film
     # WHERE po.prenotato = current_user.email AND pr.data >= current_date AND pr.ora_inizio >= current_time
     # GROUP BY pr.id_proiezione
 
-    posti = meta.table['posti']
+    posti = meta.tables['posti']
     proiezioni = meta.tables['proiezioni']
     film = meta.tables['film']
 
-    j = posti.join(proiezioni.join(film, proiezioni.c.film == film.c.id_film), posti.c.id_proiezione == proiezioni.c.id_proiezione)
+    j = posti.join(proiezioni.join(film, proiezioni.c.film == film.c.id_film),
+                   posti.c.id_proiezione == proiezioni.c.id_proiezione)
     s = select([film.c.titolo, proiezioni.c.data, proiezioni.c.ora_inizio, proiezioni.c.sala, func.count().label('num_biglietti')]).\
         select_from(j).\
         where(and_(
-                proiezione.prenotato == current_user.email,
-                proiezione.data >= func.current_date(),
-                proiezione.ora_inizio >= func.current_time()
+            proiezioni.prenotato == current_user.email,
+            or_(
+                proiezioni.c.data > func.current_date(),
+                and_(
+                    proiezioni.c.data == func.current_date(),
+                    proiezioni.c.ora_inizio >= func.current_time()
+                    )
+               )
         )).\
         group_by(proiezioni.c.id_proiezione)
 
@@ -132,7 +141,7 @@ def generate_my_projection_dict():
 
     list_all_projection = []
 
-    for row in result: #lista di dizionari
+    for row in result:  # lista di dizionari
         dict_projection = dict()
         dict_projection["titolo"] = [row['titolo']]
         dict_projection["data"] = [row['data']]
@@ -144,94 +153,143 @@ def generate_my_projection_dict():
     conn.close()
     return list_all_projection
 
+# genera una lista contenente la propiezione più recente per ogni film
 def generate_all_film_next_projection():
+    #select film, "data" ,min(ora_inizio )
+    #from proiezioni pr
+    #where pr .data = (select min("data" ) from proiezioni where "data" >= current_date and film = pr.film ) and pr .ora_inizio >= current_time
+    #group by (film , "data" )
+    return None
+
+# genera tutte le proiezioni previste per un determinato film
+def generate_all_projection_film(id):
     film = meta.tables['film']
-    proiezione = meta.tables['proiezione']
-    j = film.join(proiezione, film.c.id_film == proiezione.c.film)        #JOIN
-    s = select([film, proiezione]).select_from(j).where(func.current_date() <= proiezione.c.data)
+    proiezioni = meta.tables['proiezioni']
+    j = film.join(proiezioni, film.c.id_film == proiezioni.c.film)  # JOIN
+    s = select([film, proiezioni]).\
+        select_from(j).\
+        where(or_(
+                proiezioni.c.data > func.current_date(),
+                and_(
+                    proiezioni.c.data == func.current_date(),
+                    proiezioni.c.ora_inizio >= func.current_time()
+                    )
+                )
+            )
     conn = clienti_engine.connect()
     result = conn.execute(s)
-    list_all_film = []
+
+    list_all_projection = []
     for row in result:
-
-        dict_film = dict()
-        dict_film["id_film"] = [row['id_film']]
-        dict_film["titolo"] = [row['titolo']]
-        dict_film["durata"] = [row['durata']]
-        dict_film["id_proiezione"] = [row['id_proiezione']]
-        dict_film["ora_inizio"] = [row['ora_inizio']]
-        dict_film["data"] = [row['data']]
-        dict_film["sala"] = [row['sala']]
-        list_all_film.append(dict_film)
-
+        dict_projection = dict()
+        dict_projection["id_proiezione"] = row["id_proiezione"]
+        dict_projection["titolo"] = row["titolo"]
+        dict_projection["data"] = row["data"]
+        dict_projection["ora_inizio"] = row["ora_inizio"]
+        dict_projection["sala"] = row["sala"]
+        list_all_projection.append(dict_projection)
     conn.close()
-    return list_all_film
+    return list_all_projection
+
+# genera tutte le proiezioni future per tutti i film
+def generate_all_projection():
+    film = meta.tables['film']
+    proiezioni = meta.tables['proiezioni']
+    j = film.join(proiezioni, film.c.id_film == proiezioni.c.film)  # JOIN
+    s = select([film, proiezioni]).\
+        select_from(j).\
+        where(or_(
+                proiezioni.c.data > func.current_date(),
+                and_(
+                    proiezioni.c.data == func.current_date(),
+                    proiezioni.c.ora_inizio >= func.current_time()
+                    )
+                )
+            )
+    conn = clienti_engine.connect()
+    result = conn.execute(s)
+
+    list_all_projection = []
+    for row in result:
+        dict_projection = dict()
+        dict_projection["id_proiezione"] = row["id_proiezione"]
+        dict_projection["titolo"] = row["titolo"]
+        dict_projection["id_film"] = row["id_film"]
+        dict_projection["data"] = str(row["data"])
+        dict_projection["ora_inizio"] = str(row["ora_inizio"])
+        dict_projection["sala"] = row["sala"]
+        list_all_projection.append(dict_projection)
+    conn.close()
+    return list_all_projection
+
 
 #---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---#
 # Route principale: Home
-
-@app.route('/')
+@ app.route('/')
 def home():
     dict = generate_film_dict()
+    print(json.dumps(generate_all_projection()))
     if(current_user.is_anonymous == False and current_user.is_admin == True):
         admin = True
     else:
         admin = False
-    return render_template('home.html', film_dict=dict, is_admin = admin)
+    return render_template('home.html', film_dict=dict, is_admin=admin)
 
 #--------------------------------------------------------------------------------------------#
 # Login
-#classe che rappresenta un nostro utente
+# classe che rappresenta un nostro utente
 class Utente(UserMixin):
-    def __init__(self, email, password, is_admin): #costruttore
+    def __init__(self, email, password, is_admin):  # costruttore
         self.email = email
         self.password = password
         self.is_admin = is_admin
 
-    def get_id(self): #metodo che restituisce l'id (in questo caso, la email)
+    def get_id(self):  # metodo che restituisce l'id (in questo caso, la email)
         return self.email
 
 
-@login_manager.user_loader
-def load_user(user_email): #funzione che restituisce l'utente associato alla user_email
+@ login_manager.user_loader
+def load_user(user_email):  # funzione che restituisce l'utente associato alla user_email
     utenti = meta.tables['utenti']
-    s = select([utenti]).where(
-        utenti.c.email == user_email
-    )
+    s = select([utenti]).where(utenti.c.email == user_email)
     conn = anonim_engine.connect()
     result = conn.execute(s)
-    if result.rowcount == 0: #se non è presente l'utente cercato
+    if result.rowcount == 0:  # se non è presente l'utente cercato
         return None
     user = result.fetchone()
     conn.close()
-    return Utente(user.email, user.password, user.is_admin) #ritorna un Utente
+    # ritorna un Utente
+    return Utente(user.email, user.password, user.is_admin)
 
 
-@login_manager.unauthorized_handler #Quando il login è richiesto, e non sei loggato, vieni rimandato al login
+# Quando il login è richiesto, e non sei loggato, vieni rimandato al login
+@ login_manager.unauthorized_handler
 def unauthorized():
-    return redirect(url_for('login', errore = True, messaggio="Attenzione, non sei autorizzato ad accedere a questa pagina. Accedi con le giuste credenziali")) #TODO: dare un messaggio di errore
+    # TODO: dare un messaggio di errore
+    return redirect(url_for('login', errore=True, messaggio="Attenzione, non sei autorizzato ad accedere a questa pagina. Accedi con le giuste credenziali"))
 
 
-@app.route('/login/<errore>/<messaggio>', methods=['GET', 'POST'])
+@ app.route('/login/<errore>/<messaggio>', methods=['GET', 'POST'])
 def login(errore, messaggio):
-    if request.method == 'POST': #gestione del form
-        #prendiamo i dati dal form
+    if request.method == 'POST':  # gestione del form
+        # prendiamo i dati dal form
         email_form = request.form["email"]
         password = request.form["psw"]
-        #carichiamo l'utente
+        # carichiamo l'utente
         utente = load_user(email_form)
-        if utente != None and bcrypt.check_password_hash(utente.password, password) == True: #se la password salvata nel database e quella inserita nel form coincidono
-            login_user(utente) #loggo l'utente
+        # se la password salvata nel database e quella inserita nel form coincidono
+        if utente != None and bcrypt.check_password_hash(utente.password, password) == True:
+            login_user(utente)  # loggo l'utente
             resp = make_response(redirect(url_for('home')))
             resp.set_cookie("userEmail", current_user.email)
             return resp
         else:
-            return redirect(url_for('login', errore = True, messaggio="Attenzione, mail o password errate."))
+            return redirect(url_for('login', errore=True, messaggio="Attenzione, mail o password errate."))
     else:
-        return render_template('login.html', error = errore, error_message = messaggio)
+        return render_template('login.html', error=errore, error_message=messaggio)
 #--------------------------------------------------------------------------------------------#
 # Logout
-@app.route('/logout')
+@ app.route('/logout')
 def logout():
     resp = make_response(redirect(url_for('home')))
     resp.set_cookie("userEmail", current_user.email, max_age=0)
@@ -247,8 +305,8 @@ def logout():
 
 #--------------------------------------------------------------------------------------------#
 # HOME PER LA GESTIONE DATABASE
-@app.route('/home_gestione_sito')
-@login_required
+@ app.route('/home_gestione_sito')
+@ login_required
 def home_gestione_sito():
     if(current_user.is_admin == True):
         return render_template('AdminTemplate/home_gestione_sito.html')
@@ -258,8 +316,8 @@ def home_gestione_sito():
 
 #--------------------------------------------------------------------------------------------#
 # Inseriemnto di una persona
-@app.route('/aggiungi_persona', methods=['GET', 'POST'])
-@login_required
+@ app.route('/aggiungi_persona', methods=['GET', 'POST'])
+@ login_required
 def aggiungi_persona():
     if(current_user.is_admin == True):
         if request.method == 'POST':
@@ -276,7 +334,8 @@ def aggiungi_persona():
             conn = admin_engine.connect()  # mi connetto
             conn.execute(ins, values)  # eseguo l'inserimento con i valori
             conn.close()
-            if request.form["Submit"] == "Film": #abbiamo due diversi bottoni di sumbit
+            # abbiamo due diversi bottoni di sumbit
+            if request.form["Submit"] == "Film":
                 return redirect(url_for('aggiungi_film'))  # return
             else:
                 return redirect(url_for('aggiungi_persona'))
@@ -286,8 +345,8 @@ def aggiungi_persona():
         return errore_admin()
 #--------------------------------------------------------------------------------------------#
 # Inserimento di un film
-@app.route('/aggiungi_film', methods=['GET', 'POST'])
-@login_required
+@ app.route('/aggiungi_film', methods=['GET', 'POST'])
+@ login_required
 def aggiungi_film():
     if(current_user.is_admin == True):
         dict_p = generate_persone_dict()
@@ -308,7 +367,6 @@ def aggiungi_film():
 
             id_film = 0
 
-
             list_attori = []
             list_registi = []
             list_generi = []
@@ -318,19 +376,19 @@ def aggiungi_film():
                 if "attori" in str(elem):
                     id_attore = request.form[str(elem)]
                     if id_attore in list_attori:
-                        return render_template('aggiungi_film.html',  errore = True, error_message="Attenzione, hai scelto lo stesso attore più di una volta.", persone_dict=json.dumps(dict_p), generi_dict=json.dumps(dict_g))
+                        return render_template('aggiungi_film.html',  errore=True, error_message="Attenzione, hai scelto lo stesso attore più di una volta.", persone_dict=json.dumps(dict_p), generi_dict=json.dumps(dict_g))
                     list_attori.append(id_attore)
                 # se è un regista
                 elif "registi" in str(elem):
                     id_regista = request.form[str(elem)]
                     if id_regista in list_registi:
-                        return render_template('AdminTemplate/aggiungi_film.html',  errore = True, error_message="Attenzione, hai scelto lo stesso regista più di una volta.", persone_dict=json.dumps(dict_p), generi_dict=json.dumps(dict_g))
+                        return render_template('AdminTemplate/aggiungi_film.html',  errore=True, error_message="Attenzione, hai scelto lo stesso regista più di una volta.", persone_dict=json.dumps(dict_p), generi_dict=json.dumps(dict_g))
                     list_registi.append(id_regista)
                 # se è un genere
                 elif "generi" in str(elem):
                     tipo_genere = request.form[str(elem)]
                     if tipo_genere in list_generi:
-                        return render_template('AdminTemplate/aggiungi_film.html', errore = True, error_message="Attenzione, hai scelto lo stesso genere più di una volta.", persone_dict=json.dumps(dict_p), generi_dict=json.dumps(dict_g))
+                        return render_template('AdminTemplate/aggiungi_film.html', errore=True, error_message="Attenzione, hai scelto lo stesso genere più di una volta.", persone_dict=json.dumps(dict_p), generi_dict=json.dumps(dict_g))
                     list_generi.append(tipo_genere)
 
             # transazione per prendere l'id dell'ultimo film inserito (Ovvero quello che stiamo per inserire)
@@ -397,13 +455,13 @@ def aggiungi_film():
             conn.close()
             return redirect(url_for('aggiungi_film'))
         else:
-            return render_template('AdminTemplate/aggiungi_film.html', errore = False, error_message="", persone_dict=json.dumps(dict_p), generi_dict=json.dumps(dict_g))
+            return render_template('AdminTemplate/aggiungi_film.html', errore=False, error_message="", persone_dict=json.dumps(dict_p), generi_dict=json.dumps(dict_g))
     else:
         return errore_admin()
 #--------------------------------------------------------------------------------------------#
 # Inseriemnto di un amministratore (da parte di un amministratore)
-@app.route('/aggiungi_admin', methods=['GET', 'POST'])
-@login_required
+@ app.route('/aggiungi_admin', methods=['GET', 'POST'])
+@ login_required
 def aggiungi_admin():
     if(current_user.is_admin == True):
         if request.method == 'POST':
@@ -425,13 +483,13 @@ def aggiungi_admin():
             conn.close()
 
             if result.rowcount > 0:
-                return render_template('AdminTemplate/aggiungi_admin.html', errore = True, error_message="Attenzione, email già in uso. Inserire una email non in uso")
+                return render_template('AdminTemplate/aggiungi_admin.html', errore=True, error_message="Attenzione, email già in uso. Inserire una email non in uso")
 
             hashed_psw = bcrypt.generate_password_hash(psw).decode('utf-8')  # cripto la password
 
             # se le due password non corrispondono
             if(psw != conferma):
-                return render_template('AdminTemplate/aggiungi_admin.html', errore=True, error_message = "Attenzione, le due password non combaciano.")
+                return render_template('AdminTemplate/aggiungi_admin.html', errore=True, error_message="Attenzione, le due password non combaciano.")
             else:
                 # prendiamo la tabella utenti dal metadata tramite reflection
                 ins = utenti.insert()  # prendo la insert
@@ -447,15 +505,16 @@ def aggiungi_admin():
                 conn = admin_engine.connect()  # mi connetto
                 conn.execute(ins, values)  # eseguo l'inserimento con i valori
                 conn.close()
-                return redirect(url_for('login', errore = False, messaggio = "None"))  # return
+                # return
+                return redirect(url_for('login', errore=False, messaggio="None"))
         else:
             return render_template('AdminTemplate/aggiungi_admin.html', errore=False)
     else:
         return errore_admin()
 #--------------------------------------------------------------------------------------------#
 # Inseriemnto di una sala
-@app.route('/riepilogo_sale', methods=['GET', 'POST'])
-@login_required
+@ app.route('/riepilogo_sale', methods=['GET', 'POST'])
+@ login_required
 def riepilogo_sale():
     if(current_user.is_admin == True):
         if request.method == 'POST':
@@ -476,8 +535,8 @@ def riepilogo_sale():
         return errore_admin()
 #--------------------------------------------------------------------------------------------#
 # Inseriemnto di una proiezione
-@app.route('/aggiungi_proiezione', methods=['GET', 'POST'])
-@login_required
+@ app.route('/aggiungi_proiezione', methods=['GET', 'POST'])
+@ login_required
 def aggiungi_proiezione():
     if(current_user.is_admin == True):
         if request.method == 'POST':
@@ -510,8 +569,8 @@ def aggiungi_proiezione():
 
 #--------------------------------------------------------------------------------------------#
 # Inserimento di un genere
-@app.route('/aggiungi_genere', methods=['GET', 'POST'])
-@login_required
+@ app.route('/aggiungi_genere', methods=['GET', 'POST'])
+@ login_required
 def aggiungi_genere():
     if(current_user.is_admin == True):
         if request.method == 'POST':
@@ -520,15 +579,13 @@ def aggiungi_genere():
 
             genere = meta.tables['genere']  # prendo la tabella
 
-            s = select([genere]).where(
-                genere.c.tipo == tipo
-            )
+            s = select([genere]).where(genere.c.tipo == tipo)
             conn = anonim_engine.connect()
             result = conn.execute(s)
             conn.close()
 
             if result.rowcount > 0:
-                return render_template("AdminTemplate/aggiungi_genere.html", errore = True, error_message="Attenzione, genere già inserito.")
+                return render_template("AdminTemplate/aggiungi_genere.html", errore=True, error_message="Attenzione, genere già inserito.")
 
             ins = genere.insert()  # prendo la insert
             values = {  # dizionario per i valori
@@ -539,12 +596,14 @@ def aggiungi_genere():
             conn.close()
             return redirect(url_for('aggiungi_film'))  # return
         else:
-            return render_template('AdminTemplate/aggiungi_genere.html', errore = False)
+            return render_template('AdminTemplate/aggiungi_genere.html', errore=False)
     else:
         return errore_admin()
 
-@app.route('/rimuovi_film', methods=['GET', 'POST'])
-@login_required
+#--------------------------------------------------------------------------------------------#
+# Rimozione di un film
+@ app.route('/rimuovi_film', methods=['GET', 'POST'])
+@ login_required
 def rimuovi_film():
     if(current_user.is_admin == True):
         if request.method == 'POST':
@@ -558,37 +617,39 @@ def rimuovi_film():
                 conn = admin_engine.connect()  # mi connetto
                 conn.execute(rem)  # eseguo l'inserimento con i valori
                 conn.close()
-                return render_template('AdminTemplate/rimuovi_film.html', film_dict = generate_film_dict(), errore = False)
+                return render_template('AdminTemplate/rimuovi_film.html', film_dict=generate_film_dict(), errore=False)
             else:
-                return render_template('AdminTemplate/rimuovi_film.html', errore = True, error_message="Errore, stai provando a rimuovere una proiezione che non esiste", film_dict = generate_film_dict())
+                return render_template('AdminTemplate/rimuovi_film.html', errore=True, error_message="Errore, stai provando a rimuovere una proiezione che non esiste", film_dict=generate_film_dict())
         else:
-            return render_template('AdminTemplate/rimuovi_film.html', film_dict = generate_film_dict(), errore = False)
+            return render_template('AdminTemplate/rimuovi_film.html', film_dict=generate_film_dict(), errore=False)
     else:
         return errore_admin()
 
-@app.route('/rimuovi_proiezione', methods=['GET', 'POST'])
-@login_required
+#--------------------------------------------------------------------------------------------#
+# Rimozione di una proiezione
+@ app.route('/rimuovi_proiezione', methods=['GET', 'POST'])
+@ login_required
 def rimuovi_proiezione():
     if(current_user.is_admin == True):
         if request.method == 'POST':
-            if "film" in request.form:
+            if "film" and "proiezione" in request.form:
                 # prendiamo i dati dal form
-                id_film = request.form["film"]
+                id_pr = request.form["proiezione"]
 
-                film = meta.tables["film"]  # prendo la tabella
+                proiezioni = meta.tables["proiezioni"]  # prendo la tabella
 
-                rem = film.delete().where(film.c.id_film == id_film)
+                rem = proiezioni.delete().where(proiezioni.c.id_proiezione == id_pr)
                 conn = admin_engine.connect()  # mi connetto
                 conn.execute(rem)  # eseguo l'inserimento con i valori
                 conn.close()
-                return render_template('AdminTemplate/rimuovi_film.html', film_dict = generate_film_dict(), errore = False)
+                return render_template('AdminTemplate/rimuovi_proiezioni.html', film_dict=generate_film_dict(), proiezioni=json.dumps(generate_all_projection()), errore=False)
             else:
-                return render_template('AdminTemplate/rimuovi_film.html', errore = True, error_message="Errore, stai provando a rimuovere un film che non esiste", film_dict = generate_film_dict())
+                return render_template('AdminTemplate/rimuovi_proiezioni.html', errore=True, error_message="Errore, stai provando a rimuovere una proiezione che non esiste", film_dict=generate_film_dict(), proiezioni=json.dumps(generate_all_projection()))
         else:
-            return render_template('AdminTemplate/rimuovi_film.html', film_dict = generate_film_dict(), errore = False)
+
+            return render_template('AdminTemplate/rimuovi_proiezioni.html', film_dict=generate_film_dict(), proiezioni=json.dumps(generate_all_projection()), errore=False)
     else:
         return errore_admin()
-
 
 
 #--------------------------------------------------------------------------------------------#
@@ -599,7 +660,7 @@ def rimuovi_proiezione():
 
 #--------------------------------------------------------------------------------------------#
 # Registrazione di un nuovo utente
-@app.route('/registrazione', methods=['GET', 'POST'])
+@ app.route('/registrazione', methods=['GET', 'POST'])
 def registrazione():
     if request.method == 'POST':
         # prendiamo i dati dal form
@@ -616,7 +677,7 @@ def registrazione():
         )
         conn = anonim_engine.connect()
         result = conn.execute(s)
-        if result.rowcount > 0: #se non è presente l'utente cercato
+        if result.rowcount > 0:  # se non è presente l'utente cercato
             conn.close()
             return render_template('registrazione.html', errore=True, error_message="Attenzione, email già in uso. Inserire un'altra email")
 
@@ -640,36 +701,36 @@ def registrazione():
             }
             conn.execute(ins, values)  # eseguo l'inserimento con i valori
             conn.close()
-            return redirect(url_for('login', errore = False, messaggio = "None"))  # return
+            # return
+            return redirect(url_for('login', errore=False, messaggio="None"))
     else:
         return render_template('registrazione.html', errore=False)
 
 #--------------------------------------------------------------------------------------------#
-#Visualizzaizone saldo e ricarica protafoglio
-@app.route('/dashboard_account')
-@login_required
+# Visualizzaizone saldo e ricarica protafoglio
+@ app.route('/dashboard_account')
+@ login_required
 def dashboard_account():
 
-         utenti = meta.tables['utenti']
-         s = select([utenti]).where(utenti.c.email == current_user.email)
+    utenti = meta.tables['utenti']
+    s = select([utenti]).where(utenti.c.email == current_user.email)
 
-         conn = clienti_engine.connect()
-         result = conn.execute(s)
-         row = result.fetchone()
+    conn = clienti_engine.connect()
+    result = conn.execute(s)
+    row = result.fetchone()
 
-         portafoglio = row["saldo"]
-         name = row["nome"].capitalize()
-         surname = row["cognome"].capitalize()
-         email = row["email"]
+    portafoglio = row["saldo"]
+    name = row["nome"].capitalize()
+    surname = row["cognome"].capitalize()
+    email = row["email"]
 
-
-         conn.close()
-         return render_template('UserTemplate/dashboard_account.html', saldo = portafoglio, nome = name, cognome = surname, email = email)
+    conn.close()
+    return render_template('UserTemplate/dashboard_account.html', saldo=portafoglio, nome=name, cognome=surname, email=email)
 
 #--------------------------------------------------------------------------------------------#
-#modifica dei dati
-@app.route('/cambia_password', methods=['GET', 'POST'])
-@login_required
+# modifica dei dati
+@ app.route('/cambia_password', methods=['GET', 'POST'])
+@ login_required
 def cambia_password():
     if request.method == "POST":
 
@@ -683,29 +744,30 @@ def cambia_password():
         psw_ceck = bcrypt.check_password_hash(current_user.password, old_psw)
 
         if psw_ceck == False:
-           return render_template('UserTemplate/cambia_password.html', errore=True, error_message="Errore: password vecchia errata!")  #Messaggio di errore da inviare all'utente
+            # Messaggio di errore da inviare all'utente
+            return render_template('UserTemplate/cambia_password.html', errore=True, error_message="Errore: password vecchia errata!")
         elif psw != conferma:
-           conn.close()
-           return render_template('UserTemplate/cambia_password.html', errore=True, error_message="Attenzione, le due nuove password non combaciano. Prego reinserire correttamente i dati")
+            conn.close()
+            return render_template('UserTemplate/cambia_password.html', errore=True, error_message="Attenzione, le due nuove password non combaciano. Prego reinserire correttamente i dati")
         elif old_psw == psw:
-           conn.close()
-           return render_template('UserTemplate/cambia_password.html', errore=True, error_message="Attenzione, la vecchia e la nuova password combaciano. Prego reinserire password diverse")
+            conn.close()
+            return render_template('UserTemplate/cambia_password.html', errore=True, error_message="Attenzione, la vecchia e la nuova password combaciano. Prego reinserire password diverse")
         else:
-           psw_new_hash = bcrypt.generate_password_hash(psw).decode('utf-8')
-           ins = utenti.update().where(utenti.c.email == current_user.email)
-           values = {
-               'password' : psw_new_hash
-           }
+            psw_new_hash = bcrypt.generate_password_hash(psw).decode('utf-8')
+            ins = utenti.update().where(utenti.c.email == current_user.email)
+            values = {
+                'password': psw_new_hash
+            }
 
-           conn.execute(ins, values)
-           conn.close()
-           return redirect(url_for('dashboard_account'))
+            conn.execute(ins, values)
+            conn.close()
+            return redirect(url_for('dashboard_account'))
     else:
-           return render_template('UserTemplate/cambia_password.html', errore = False)
+        return render_template('UserTemplate/cambia_password.html', errore=False)
 
 #--------------------------------------------------------------------------------------------#
-@app.route('/ricarica_saldo', methods=['GET', 'POST'])
-@login_required
+@ app.route('/ricarica_saldo', methods=['GET', 'POST'])
+@ login_required
 def ricarica_saldo():
     utenti = meta.tables['utenti']
     s = select([utenti]).where(utenti.c.email == current_user.email)
@@ -715,47 +777,51 @@ def ricarica_saldo():
 
     if request.method == "POST":
         taglio = request.form["taglio"]
-        ins = utenti.update().where(utenti.c.email == current_user.email);
+        ins = utenti.update().where(utenti.c.email == current_user.email)
         values = {
-            'saldo' : saldo + float(taglio)
+            'saldo': saldo + float(taglio)
         }
 
-        conn.execute(ins,values)
+        conn.execute(ins, values)
         conn.close()
         return redirect(url_for('dashboard_account'))
 
     else:
-        return render_template('UserTemplate/ricarica_saldo.html', saldo = saldo)
+        return render_template('UserTemplate/ricarica_saldo.html', saldo=saldo)
 
 #--------------------------------------------------------------------------------------------#
-@app.route('/prenota_biglietto', methods=['GET', 'POST'])
-@login_required
+@ app.route('/prenota_biglietto', methods=['GET', 'POST'])
+@ login_required
 def prenota_biglietto():
     if request.method == "POST":
         print(request.json)
         return 'OK', 200
     else:
-        return render_template('UserTemplate/prenota_biglietto.html', errore = False, titolo = "ciao")
+        return render_template('UserTemplate/prenota_biglietto.html', errore=False, titolo="ciao")
 
 #--------------------------------------------------------------------------------------------#
-@app.route('/tutti_i_film')
-@login_required
+# visualizziamo tutti i film con la prossima proiezione in programma
+@ app.route('/tutti_i_film')
+@ login_required
 def tutti_i_film():
-    dict = generate_all_film_next_projection()
-    return render_template('UserTemplate/tutti_i_film.html', film_dict=dict_f, proiezioni_dict=dict_p)
+    return None
+    #dict = generate_all_film_next_projection()
+    # return render_template('UserTemplate/tutti_i_film.html', film_dict=dict_f, proiezioni_dict=dict_p)
 
 #--------------------------------------------------------------------------------------------#
+# visualizziamo tutte le proiezioni in programma per un determinato film
 @app.route('/tutte_le_proiezioni')
-@login_required
+@ login_required
 def tutte_le_proiezioni():
     dict = generate_film_dict()
     return render_template('UserTemplate/tutte_le_proiezioni.html', film_dict=dict)
 
 #--------------------------------------------------------------------------------------------#
-@app.route('/le_mie_prenotazioni')
-@login_required
+# visualizziamo tutte le mie prenotazioni
+@ app.route('/le_mie_prenotazioni')
+@ login_required
 def le_mie_prenotazioni():
-    dict = generate_my_projection_dict();
+    dict = generate_my_projection_dict()
     return render_template('UserTemplate/le_mie_prenotazioni.html', projection_dict=dict)
 
 #--------------------------------------------------------------------------------------------#

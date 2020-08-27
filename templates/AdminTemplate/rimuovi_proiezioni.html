@@ -1,0 +1,33 @@
+{% extends "main_template.html" %}
+
+{% block pagebody %}
+
+  {% if errore %}
+    <script>
+    function alertError(messaggio) {
+      alert(messaggio);
+    }
+    alertError({{error_message|tojson}})
+    </script>
+  {% endif %}
+
+  <script src="{{url_for('static', filename='rimuovi_proiezioni.js')}}"></script>
+
+  <form method="POST">
+
+    <label for = "film">Scegli il film da cui vuoi eliminare la proiezione:</label>
+    <select name="film" id="film" onchange='selectProiezioni({{ proiezioni|safe }})' autofocus>
+      <option value="" selected disabled hidden>Scegli qui</option>
+      {% for id_film, titolo in film_dict.items() %}
+      <option value={{id_film}}>{{titolo[0]}}</option>
+      {% endfor %}
+    </select><br>
+
+    <label for = "film">Scegli la proiezione da eliminare:</label>
+    <select name="proiezione" id="proiezione">
+    </select><br>
+
+    <button type = "submit" name = "Submit" value = "Rimuovi">Rimuovi Proiezione
+  </form>
+
+{% endblock %}

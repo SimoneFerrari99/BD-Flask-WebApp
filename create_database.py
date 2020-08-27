@@ -1,9 +1,9 @@
-#Progetto basi di dati 2020 - Tema Cinema
+# Progetto basi di dati 2020 - Tema Cinema
 #Gruppo: ArceCity
-#Membri: Casarotti Giulio, Ferrari Simone, Trolese Gulio
+# Membri: Casarotti Giulio, Ferrari Simone, Trolese Gulio
 
 #File: create_database.py
-#Descrizione: Creazione del database
+# Descrizione: Creazione del database
 
 #---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---#
 from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String, Date, Time, Float, Boolean, Text, ForeignKey
@@ -16,11 +16,11 @@ from sqlalchemy.dialects.postgresql import ENUM
 # api url: https://docs.sqlalchemy.org/en/13/dialects/postgresql.html#module-sqlalchemy.dialects.postgresql.psycopg2
 # engine = create_engine(
 # "postgres+psycopg2://postgres:ciao@serversrv.ddns.net:2345/progetto2020")
-#engine = create_engine("postgres+psycopg2://giulio:Giulio99:)@/progettobd")
-engine = create_engine("postgres+psycopg2://postgres:simone@localhost/progettobd")
+engine = create_engine("postgres+psycopg2://giulio:Giulio99:)@/progettobd")
+#engine = create_engine("postgres+psycopg2://postgres:simone@localhost/progettobd")
 
 # funzione di sqlalchemy_utils che, se non esiste l'url del database, lo crea
-if database_exists(engine.url): #elimina se esiste e lo ricrea
+if database_exists(engine.url):  # elimina se esiste e lo ricrea
     drop_database(engine.url)
 if not database_exists(engine.url):
     create_database(engine.url)
@@ -31,16 +31,16 @@ metadata = MetaData()  # oggetto su cui vengono salvate le tabelle
 #---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---#
 
 utenti = Table('utenti', metadata,
-                Column('nome', String(255)),
-                Column('cognome', String(255)),
-                Column('data_nascita', Date),
-                # String(320) perchè lo standard prevede 64 per il nome utente, @, 255 caratteri per il dominio
-                Column('email', String(320), primary_key=True),
-                # la nostra password verrà criptata tramite flask-bcrypt, 60 è una lunghezza di default di bycript
-                Column('password', String(60), nullable=False),
-                Column('is_admin', Boolean),
-                Column('saldo', Float)
-                )
+               Column('nome', String(255)),
+               Column('cognome', String(255)),
+               Column('data_nascita', Date),
+               # String(320) perchè lo standard prevede 64 per il nome utente, @, 255 caratteri per il dominio
+               Column('email', String(320), primary_key=True),
+               # la nostra password verrà criptata tramite flask-bcrypt, 60 è una lunghezza di default di bycript
+               Column('password', String(60), nullable=False),
+               Column('is_admin', Boolean),
+               Column('saldo', Float)
+               )
 
 film = Table('film', metadata,
              Column('id_film', Integer, primary_key=True),
@@ -50,8 +50,8 @@ film = Table('film', metadata,
              )
 
 genere = Table('genere', metadata,
-             Column('tipo', String(255), primary_key=True)
-             )
+               Column('tipo', String(255), primary_key=True)
+               )
 
 persone = Table('persone', metadata,
                 Column('id_persona', Integer, primary_key=True),
@@ -65,11 +65,11 @@ sale = Table('sale', metadata,
              )
 
 genere_film = Table('genere_film', metadata,
-                   Column('id_film', Integer, ForeignKey(
-                       "film.id_film", onupdate="CASCADE", ondelete="CASCADE"), nullable=False),
-                   Column('tipo_genere', String(255), ForeignKey(
-                       "genere.tipo", onupdate="CASCADE", ondelete="CASCADE"), nullable=False)
-                   )
+                    Column('id_film', Integer, ForeignKey(
+                        "film.id_film", onupdate="CASCADE", ondelete="CASCADE"), nullable=False),
+                    Column('tipo_genere', String(255), ForeignKey(
+                        "genere.tipo", onupdate="CASCADE", ondelete="CASCADE"), nullable=False)
+                    )
 
 proiezioni = Table('proiezioni', metadata,
                    Column('id_proiezione', Integer, primary_key=True),
@@ -84,7 +84,8 @@ proiezioni = Table('proiezioni', metadata,
 posti = Table('posti', metadata,
               Column('id_posto', Integer, primary_key=True),
               Column('prezzo', Float),
-              Column('prenotato', String(320), ForeignKey("utenti.email", onupdate="CASCADE", ondelete="SET NULL")),
+              Column('prenotato', String(320), ForeignKey(
+                  "utenti.email", onupdate="CASCADE", ondelete="SET NULL")),
               Column('id_proiezione', Integer, ForeignKey(
                   "proiezioni.id_proiezione", onupdate="CASCADE", ondelete="CASCADE"), nullable=False)
               )
@@ -137,11 +138,11 @@ conn.execute("GRANT UPDATE ON utenti TO clienti")
 conn.execute("GRANT INSERT ON posti TO clienti")
 
 conn.execute("GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO superuser")
-conn.execute("GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO superuser")
+conn.execute(
+    "GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO superuser")
 
 conn.execute("GRANT SELECT ON ALL TABLES IN SCHEMA public TO anonimous")
 conn.execute("GRANT INSERT ON utenti TO anonimous")
-
 
 
 conn.execute("GRANT superuser TO admin")
@@ -164,10 +165,10 @@ conn.execute('''CREATE TRIGGER refund
                EXECUTE PROCEDURE refund()''')
 
 
-#conn.execute([{"CREATE ROLE admin"}
+# conn.execute([{"CREATE ROLE admin"}
 #              {"CREATE ROLE customer"}])
 
-#conn.execute()
+# conn.execute()
 
 
-#GRANT ALL PRIVILEGES ON DATABASE progettobd TO admin;
+# GRANT ALL PRIVILEGES ON DATABASE progettobd TO admin;
