@@ -28,8 +28,8 @@
   <input style="margin-left: 1.4em;" type="button" onclick="location.href='/dashboard_account';" value="Il mio account" />
 
   <h2>Lista di tutti i film disponibili nel nostro cinema!</h2>
-  {% for id_film, elem_list in film_dict.items() %}
-  <!-- {% for id_film, elem_list in film_dict_next.items() %} da sistemare -->
+
+  {% for id_film, elem_list in next_projection.items() %}
     <div style="float:left">
       <img src="static/copertine/{{ id_film }}.jpg" height="200" width="150" alt="copertina di {{ elem_list[0] }}">
     </div>

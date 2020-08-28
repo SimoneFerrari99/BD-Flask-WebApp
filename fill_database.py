@@ -1,3 +1,12 @@
+# Progetto basi di dati 2020 - Tema Cinema
+#Gruppo: ArceCity
+# Membri: Casarotti Giulio, Ferrari Simone, Trolese Gulio
+
+#File: fill_database.py
+# Descrizione: Riempimento del database con dati di prova
+
+#---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---#
+
 from create_database import utenti, film, genere, persone, sale, genere_film, proiezioni, posti, attori, registi
 from sqlalchemy import create_engine
 from flask_bcrypt import Bcrypt
@@ -24,7 +33,14 @@ conn.execute(ins, [
     {'titolo': 'Top Gun', 'durata': 110, 'descrizione': 'Top Gun è un film d\'azione del 1986, diretto da Tony Scott '},
     {'titolo': 'Mission: Impossible - Fallout', 'durata': 147, 'descrizione': 'Mission: Impossible - Fallout è un film del 2018 scritto e diretto da Christopher McQuarrie.'},
     {'titolo': 'Skyfall', 'durata': 143, 'descrizione': 'Skyfall è un film del 2012 diretto da Sam Mendes.'},
-    {'titolo': 'The imitation game', 'durata': 113, 'descrizione': 'The Imitation Game è un film del 2014 diretto da Morten Tyldum.'}
+    {'titolo': 'The imitation game', 'durata': 113, 'descrizione': 'The Imitation Game è un film del 2014 diretto da Morten Tyldum.'},
+    {'titolo': 'Dunkirk', 'durata': 106, 'descrizione': 'Dunkirk è un film del 2017 co-prodotto, scritto e diretto da Christopher Nolan.'},
+    {'titolo': 'Interstellar', 'durata': 169, 'descrizione': 'Interstellar è un film del 2014 diretto da Christopher Nolan.'},
+    {'titolo': 'Film Esempio #1', 'durata': 120, 'descrizione': 'Descrizione del film esempio #1'},
+    {'titolo': 'Film Esempio #2', 'durata': 146, 'descrizione': 'Descrizione del film esempio #2'},
+    {'titolo': 'Film Esempio #3', 'durata': 113, 'descrizione': 'Descrizione del film esempio #3'},
+    {'titolo': 'Film Esempio #4', 'durata': 98, 'descrizione': 'Descrizione del film esempio #4'},
+    {'titolo': 'Film Esempio #5', 'durata': 168, 'descrizione': 'Descrizione del film esempio #5'},
 ])
 
 ins = genere.insert()
@@ -58,7 +74,6 @@ conn.execute(ins, [
     {'nome': 'Merly', 'cognome': 'Streep'},
     {'nome': 'Daniel', 'cognome': 'Craig'},
     {'nome': 'Benedict', 'cognome': 'Cumberbatch'},
-
     {'nome': 'James', 'cognome': 'Cameron'},
     {'nome': 'Martin', 'cognome': 'Scorsese'},
     {'nome': 'Tim', 'cognome': 'Burton'},
@@ -67,6 +82,11 @@ conn.execute(ins, [
     {'nome': 'Christopher', 'cognome': 'McQuarrie'},
     {'nome': 'Sam', 'cognome': 'Mendes'},
     {'nome': 'Morten', 'cognome': 'Tyldum'},
+    {'nome': 'Fionn', 'cognome': 'Whitehead'},
+    {'nome': 'Tom', 'cognome': 'Glynn-Carney'},
+    {'nome': 'Jack', 'cognome': 'Lowden'},
+    {'nome': 'Matthew', 'cognome': 'McConaughey'},
+    {'nome': 'Cristopher', 'cognome': 'Nolan'}
 ])
 
 
@@ -96,29 +116,102 @@ conn.execute(ins, [
     {'id_film': 7, 'tipo_genere': 'Azione'},
     {'id_film': 7, 'tipo_genere': 'Spionaggio'},
     {'id_film': 8, 'tipo_genere': 'Guerra'},
-    {'id_film': 8, 'tipo_genere': 'Storico'}
+    {'id_film': 8, 'tipo_genere': 'Storico'},
+    {'id_film': 9, 'tipo_genere': 'Drammatico'},
+    {'id_film': 9, 'tipo_genere': 'Guerra'},
+    {'id_film': 9, 'tipo_genere': 'Storico'},
+    {'id_film': 10, 'tipo_genere': 'Avventura'},
+    {'id_film': 10, 'tipo_genere': 'Drammatico'},
+    {'id_film': 10, 'tipo_genere': 'Fantascienza'},
+    {'id_film': 11, 'tipo_genere': 'Horror'},
+    {'id_film': 12, 'tipo_genere': 'Commedia'},
+    {'id_film': 12, 'tipo_genere': 'Drammatico'},
+    {'id_film': 13, 'tipo_genere': 'Azione'},
+    {'id_film': 13, 'tipo_genere': 'Thriller'},
+    {'id_film': 14, 'tipo_genere': 'Fantascienza'},
+    {'id_film': 14, 'tipo_genere': 'Guerra'},
+    {'id_film': 15, 'tipo_genere': 'Spionaggio'},
+    {'id_film': 15, 'tipo_genere': 'Storico'}
 ])
 
 
 ins = proiezioni.insert()
 conn.execute(ins, [
-    {'data': '2020-08-01', 'ora_inizio': '16:00', 'sala': 1, 'film': 1},
-    {'data': '2020-08-01', 'ora_inizio': '16:30', 'sala': 2, 'film': 2},
-    {'data': '2020-08-02', 'ora_inizio': '19:00', 'sala': 1, 'film': 3},
-    {'data': '2020-08-02', 'ora_inizio': '19:00', 'sala': 2, 'film': 4},
-    {'data': '2020-08-03', 'ora_inizio': '16:00', 'sala': 1, 'film': 1},
-    {'data': '2020-08-03', 'ora_inizio': '17:00', 'sala': 2, 'film': 5},
-    {'data': '2020-08-03', 'ora_inizio': '17:30', 'sala': 3, 'film': 6},
-    {'data': '2020-08-04', 'ora_inizio': '21:00', 'sala': 1, 'film': 1},
-    {'data': '2020-08-04', 'ora_inizio': '21:00', 'sala': 2, 'film': 8},
-    {'data': '2020-08-05', 'ora_inizio': '16:00', 'sala': 1, 'film': 7},
-    {'data': '2020-08-05', 'ora_inizio': '17:00', 'sala': 2, 'film': 5},
-    {'data': '2020-08-05', 'ora_inizio': '19:00', 'sala': 3, 'film': 4},
-    {'data': '2020-08-06', 'ora_inizio': '22:00', 'sala': 1, 'film': 2},
-    {'data': '2020-08-07', 'ora_inizio': '18:00', 'sala': 1, 'film': 3},
-    {'data': '2020-08-07', 'ora_inizio': '22:00', 'sala': 1, 'film': 3},
-    {'data': '2020-08-07', 'ora_inizio': '16:00', 'sala': 2, 'film': 8},
-    {'data': '2020-08-07', 'ora_inizio': '21:00', 'sala': 2, 'film': 8},
+    {'data': '2020-08-30', 'ora_inizio': '16:00', 'sala': 1, 'film': 1},
+    {'data': '2020-08-30', 'ora_inizio': '16:30', 'sala': 2, 'film': 3},
+    {'data': '2020-08-30', 'ora_inizio': '21:00', 'sala': 1, 'film': 2},
+    {'data': '2020-08-30', 'ora_inizio': '21:30', 'sala': 2, 'film': 5},
+
+    {'data': '2020-08-31', 'ora_inizio': '17:00', 'sala': 1, 'film': 13},
+    {'data': '2020-08-31', 'ora_inizio': '19:45', 'sala': 2, 'film': 12},
+    {'data': '2020-08-31', 'ora_inizio': '16:00', 'sala': 3, 'film': 5},
+    {'data': '2020-08-31', 'ora_inizio': '21:45', 'sala': 1, 'film': 4},
+
+    {'data': '2020-09-01', 'ora_inizio': '16:00', 'sala': 1, 'film': 12},
+    {'data': '2020-09-01', 'ora_inizio': '16:00', 'sala': 3, 'film': 11},
+    {'data': '2020-09-01', 'ora_inizio': '21:00', 'sala': 1, 'film': 7},
+    {'data': '2020-09-01', 'ora_inizio': '19:00', 'sala': 3, 'film': 6},
+
+    {'data': '2020-09-02', 'ora_inizio': '15:25', 'sala': 3, 'film': 14},
+    {'data': '2020-09-02', 'ora_inizio': '16:00', 'sala': 2, 'film': 13},
+    {'data': '2020-09-02', 'ora_inizio': '22:00', 'sala': 2, 'film': 1},
+    {'data': '2020-09-02', 'ora_inizio': '19:45', 'sala': 3, 'film': 11},
+
+    {'data': '2020-09-03', 'ora_inizio': '19:45', 'sala': 3, 'film': 7},
+    {'data': '2020-09-03', 'ora_inizio': '15:45', 'sala': 3, 'film': 10},
+    {'data': '2020-09-03', 'ora_inizio': '21:45', 'sala': 1, 'film': 4},
+    {'data': '2020-09-03', 'ora_inizio': '23:45', 'sala': 2, 'film': 6},
+
+    {'data': '2020-09-04', 'ora_inizio': '19:45', 'sala': 1, 'film': 9},
+    {'data': '2020-09-04', 'ora_inizio': '21:20', 'sala': 2, 'film': 3},
+    {'data': '2020-09-04', 'ora_inizio': '19:10', 'sala': 3, 'film': 5},
+    {'data': '2020-09-04', 'ora_inizio': '22:10', 'sala': 3, 'film': 2},
+
+    {'data': '2020-09-05', 'ora_inizio': '19:00', 'sala': 3, 'film': 3},
+    {'data': '2020-09-05', 'ora_inizio': '19:10', 'sala': 2, 'film': 14},
+    {'data': '2020-09-05', 'ora_inizio': '15:00', 'sala': 1, 'film': 3},
+    {'data': '2020-09-05', 'ora_inizio': '15:10', 'sala': 2, 'film': 14},
+
+    {'data': '2020-09-06', 'ora_inizio': '19:00', 'sala': 2, 'film': 4},
+    {'data': '2020-09-06', 'ora_inizio': '14:00', 'sala': 1, 'film': 2},
+    {'data': '2020-09-06', 'ora_inizio': '16:20', 'sala': 3, 'film': 1},
+    {'data': '2020-09-06', 'ora_inizio': '23:30', 'sala': 3, 'film': 6},
+
+    {'data': '2020-09-07', 'ora_inizio': '19:00', 'sala': 3, 'film': 10},
+    {'data': '2020-09-07', 'ora_inizio': '19:45', 'sala': 2, 'film': 8},
+    {'data': '2020-09-07', 'ora_inizio': '15:00', 'sala': 1, 'film': 9},
+    {'data': '2020-09-07', 'ora_inizio': '19:45', 'sala': 1, 'film': 15},
+
+    {'data': '2020-09-08', 'ora_inizio': '15:30', 'sala': 1, 'film': 15},
+    {'data': '2020-09-08', 'ora_inizio': '17:20', 'sala': 2, 'film': 15},
+    {'data': '2020-09-08', 'ora_inizio': '19:40', 'sala': 3, 'film': 9},
+    {'data': '2020-09-08', 'ora_inizio': '23:45', 'sala': 1, 'film': 9},
+
+    {'data': '2020-09-09', 'ora_inizio': '18:00', 'sala': 1, 'film': 7},
+    {'data': '2020-09-09', 'ora_inizio': '19:00', 'sala': 2, 'film': 6},
+    {'data': '2020-09-09', 'ora_inizio': '20:00', 'sala': 3, 'film': 3},
+    {'data': '2020-09-09', 'ora_inizio': '22:45', 'sala': 1, 'film': 12},
+
+    {'data': '2020-09-10', 'ora_inizio': '15:10', 'sala': 1, 'film': 4},
+    {'data': '2020-09-10', 'ora_inizio': '18:00', 'sala': 3, 'film': 6},
+    {'data': '2020-09-10', 'ora_inizio': '20:30', 'sala': 1, 'film': 13},
+    {'data': '2020-09-10', 'ora_inizio': '16:00', 'sala': 2, 'film': 11},
+
+    {'data': '2020-09-11', 'ora_inizio': '16:00', 'sala': 1, 'film': 10},
+    {'data': '2020-09-11', 'ora_inizio': '17:10', 'sala': 2, 'film': 13},
+    {'data': '2020-09-11', 'ora_inizio': '18:20', 'sala': 3, 'film': 7},
+    {'data': '2020-09-11', 'ora_inizio': '19:30', 'sala': 1, 'film': 1},
+
+    {'data': '2020-09-12', 'ora_inizio': '15:30', 'sala': 1, 'film': 2},
+    {'data': '2020-09-12', 'ora_inizio': '15:45', 'sala': 2, 'film': 12},
+    {'data': '2020-09-12', 'ora_inizio': '19:30', 'sala': 1, 'film': 15},
+    {'data': '2020-09-12', 'ora_inizio': '19:15', 'sala': 3, 'film': 8},
+
+    {'data': '2020-09-13', 'ora_inizio': '17:30', 'sala': 1, 'film': 4},
+    {'data': '2020-09-13', 'ora_inizio': '20:15', 'sala': 1, 'film': 3},
+    {'data': '2020-09-13', 'ora_inizio': '21:10', 'sala': 1, 'film': 1},
+    {'data': '2020-09-13', 'ora_inizio': '23:50', 'sala': 1, 'film': 14},
+
 ])
 
 
@@ -138,8 +231,24 @@ conn.execute(ins, [
     {'id_persona': 5, 'id_film': 5},
     {'id_persona': 5, 'id_film': 6},
     {'id_persona': 11, 'id_film': 7},
-    {'id_persona': 12, 'id_film': 8}
-
+    {'id_persona': 12, 'id_film': 8},
+    {'id_persona': 21, 'id_film': 9},
+    {'id_persona': 22, 'id_film': 9},
+    {'id_persona': 23, 'id_film': 9},
+    {'id_persona': 24, 'id_film': 10},
+    {'id_persona': 23, 'id_film': 11},
+    {'id_persona': 19, 'id_film': 11},
+    {'id_persona': 7, 'id_film': 12},
+    {'id_persona': 12, 'id_film': 12},
+    {'id_persona': 20, 'id_film': 13},
+    {'id_persona': 25, 'id_film': 13},
+    {'id_persona': 24, 'id_film': 14},
+    {'id_persona': 11, 'id_film': 14},
+    {'id_persona': 10, 'id_film': 14},
+    {'id_persona': 3, 'id_film': 15},
+    {'id_persona': 4, 'id_film': 15},
+    {'id_persona': 8, 'id_film': 15},
+    {'id_persona': 16, 'id_film': 15}
 ])
 
 
@@ -152,5 +261,17 @@ conn.execute(ins, [
     {'id_persona': 17, 'id_film': 5},
     {'id_persona': 18, 'id_film': 6},
     {'id_persona': 19, 'id_film': 7},
-    {'id_persona': 20, 'id_film': 8}
+    {'id_persona': 20, 'id_film': 8},
+    {'id_persona': 25, 'id_film': 9},
+    {'id_persona': 25, 'id_film': 10},
+    {'id_persona': 17, 'id_film': 11},
+    {'id_persona': 21, 'id_film': 12},
+    {'id_persona': 20, 'id_film': 13},
+    {'id_persona': 7, 'id_film': 13},
+    {'id_persona': 24, 'id_film': 14},
+    {'id_persona': 12, 'id_film': 14},
+    {'id_persona': 18, 'id_film': 14},
+    {'id_persona': 1, 'id_film': 15},
+    {'id_persona': 3, 'id_film': 15},
+    {'id_persona': 13, 'id_film': 15}
 ])

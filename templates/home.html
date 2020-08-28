@@ -34,19 +34,18 @@
   {% endif %}
 
 
-  <h2>A breve in sala...</h2>
-  {% for id_film, elem_list in film_dict.items() %}
+  <h2>A breve nelle nostre sale:</h2>
+  {% for dict in proj_list %}
     <div style="float:left">
-      <img src="static/copertine/{{ id_film }}.jpg" height="200" width="150" alt="copertina di {{ elem_list[0] }}">
+      <img src="static/copertine/{{ dict['id_film'] }}.jpg" height="200" width="150" alt="copertina di {{ dict['titolo'] }}">
     </div>
     <div style="float:left">
-      <h3 id="titolo">Titolo: {{ elem_list[0] }}</h3>
-      <h4 id="durata">Durata: {{ elem_list[1] }} minuti</h4>
-      <p id="descrizione">{{ elem_list[2] }}</p>
-      <h3 style="margin-top: 1em;" id="prossimaproiezione">Prossima proiezione: [Giorno] [Ora] [Sala]</h3>
+      <h3 id="titolo">Titolo: {{ dict["titolo"] }}</h3>
+      <h4 id="durata">Durata: {{ dict["durata"] }} minuti</h4>
+      <p id="descrizione">{{ dict["descrizione"] }}</p>
+      <h3 style="margin-top: 1em;" id="prossimaproiezione">Prossima proiezione: {{ dict["data"] }} {{ dict["ora_inizio"] }}   Sala: {{ dict["sala"] }}</h3>
       <input style="margin-left: 1.4em;" type="button" onclick="location.href='/prenota_biglietto';" value="Prenota biglietti per questa proiezione" />
       <input style="margin-left: 1.4em;" type="button" onclick="location.href='/tutte_le_proiezioni';" value="Vedi altre proiezioni per questo film" />
-
     </div>
     <div style="clear:both"/>
   {% endfor %}

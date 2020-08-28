@@ -28,7 +28,7 @@
 <input style="margin-left: 1.4em;" type="button" onclick="location.href='/dashboard_account';" value="Il mio account" />
 
 <h2>Le tue prenotazioni</h2>
-{% for id_film, elem_list in film_dict.items() %}
+{% for id_film, elem_list in projection_dict.items() %}
   <div style="float:left">
     <img src="static/copertine/{{ id_film }}.jpg" height="200" width="150" alt="copertina di {{ elem_list[0] }}">
   </div>
