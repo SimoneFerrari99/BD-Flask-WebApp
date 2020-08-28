@@ -16,8 +16,8 @@ from sqlalchemy.dialects.postgresql import ENUM
 # api url: https://docs.sqlalchemy.org/en/13/dialects/postgresql.html#module-sqlalchemy.dialects.postgresql.psycopg2
 # engine = create_engine(
 # "postgres+psycopg2://postgres:ciao@serversrv.ddns.net:2345/progetto2020")
-engine = create_engine("postgres+psycopg2://giulio:Giulio99:)@/progettobd")
-#engine = create_engine("postgres+psycopg2://postgres:simone@localhost/progettobd")
+#engine = create_engine("postgres+psycopg2://giulio:Giulio99:)@/progettobd")
+engine = create_engine("postgres+psycopg2://postgres:simone@localhost/progettobd")
 
 # funzione di sqlalchemy_utils che, se non esiste l'url del database, lo crea
 if database_exists(engine.url):  # elimina se esiste e lo ricrea
