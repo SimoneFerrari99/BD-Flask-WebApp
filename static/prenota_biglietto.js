@@ -5,7 +5,7 @@ function selezionaPosto(id){
   posti_sel.push(id);
   importo += 5;
   let totale = document.getElementById("importo");
-  totale.innerHTML = importo;
+  totale.innerHTML = importo + ".0€";
   let bottone = document.getElementById(id);
   bottone.style.backgroundColor = "red";
   bottone.setAttribute( "onClick", "deselezionaPosto(id)");
@@ -15,7 +15,7 @@ function deselezionaPosto(id){
   posti_sel.pop(id);
   importo -= 5;
   let totale = document.getElementById("importo");
-  totale.innerHTML = importo;
+  totale.innerHTML = importo + ".0€";
   let bottone = document.getElementById(id);
   bottone.style.backgroundColor = "green";
   bottone.setAttribute( "onClick", "selezionaPosto(id)");

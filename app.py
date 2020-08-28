@@ -863,8 +863,9 @@ def prenota_biglietto():
 # visualizziamo tutti i film con la prossima proiezione in programma
 @ app.route('/tutti_i_film')
 def tutti_i_film():
-    dict = generate_all_film_next_projection()
-    return render_template('UserTemplate/tutti_i_film.html', next_projection=dict)
+    proj_list = generate_all_film_next_projection()
+    ordered_list = sorted(proj_list, key = lambda i: (i['titolo']))
+    return render_template('UserTemplate/tutti_i_film.html', proj_list=ordered_list)
 
 #--------------------------------------------------------------------------------------------#
 # visualizziamo tutte le proiezioni in programma per un determinato film

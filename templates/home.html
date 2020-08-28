@@ -3,24 +3,27 @@
 {% block pagebody %}
 
   <style>
-  h3 {
-    display: block;
-    margin-top: 0.7em;
-    margin-bottom: 0.5em;
-    margin-left: 1em;
-  }
-  h4 {
-    display: block;
-    margin-top: 0em;
-    margin-bottom: 0.5em;
-    margin-left: 1.2em;
-  }
-  p {
-    display: block;
-    margin-top: 0em;
-    margin-bottom: 1em;
-    margin-left: 1.2em;
-  }
+    h2 {
+      margin-bottom: 0.3em;
+    }
+    h3 {
+      display: block;
+      margin-top: 0.7em;
+      margin-bottom: 0.5em;
+      margin-left: 1em;
+    }
+    h4 {
+      display: block;
+      margin-top: 0em;
+      margin-bottom: 0.5em;
+      margin-left: 1.2em;
+    }
+    p {
+      display: block;
+      margin-top: 0em;
+      margin-bottom: 1em;
+      margin-left: 1.2em;
+    }
   </style>
 
   <input style="margin-left: 1.4em;" type="button" onclick="location.href='/tutti_i_film';" value="Vedi tutti i film" />
@@ -40,12 +43,12 @@
       <img src="static/copertine/{{ dict['id_film'] }}.jpg" height="200" width="150" alt="copertina di {{ dict['titolo'] }}">
     </div>
     <div style="float:left">
-      <h3 id="titolo">Titolo: {{ dict["titolo"] }}</h3>
-      <h4 id="durata">Durata: {{ dict["durata"] }} minuti</h4>
+      <h3 id="titolo">{{ dict["titolo"] }}</h3>
+      <h4 id="durata">{{ dict["durata"] }} minuti</h4>
       <p id="descrizione">{{ dict["descrizione"] }}</p>
-      <h3 style="margin-top: 1em;" id="prossimaproiezione">Prossima proiezione: {{ dict["data"] }} {{ dict["ora_inizio"] }}   Sala: {{ dict["sala"] }}</h3>
-      <input style="margin-left: 1.4em;" type="button" onclick="location.href='/prenota_biglietto';" value="Prenota biglietti per questa proiezione" />
-      <input style="margin-left: 1.4em;" type="button" onclick="location.href='/tutte_le_proiezioni';" value="Vedi altre proiezioni per questo film" />
+      <h3 style="margin-top: 1em;" id="prossimaproiezione">Prossima proiezione: &nbsp; {{ dict["data"] }} &nbsp;&nbsp; {{ dict["ora_inizio"] }} &nbsp;&nbsp; Sala: {{ dict["sala"] }}</h3>
+      <input style="margin-left: 1.4em;" type="button" onclick="location.href='/prenota_biglietto';" value="Acquista" /> <br>
+      <input style="margin-top: 0.5em; margin-left: 1.4em;" type="button" onclick="location.href='/tutte_le_proiezioni';" value="Altre date per questo film" />
     </div>
     <div style="clear:both"/>
   {% endfor %}
