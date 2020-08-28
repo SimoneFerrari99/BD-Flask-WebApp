@@ -17,22 +17,14 @@ conn = engine.connect()
 
 ins = film.insert()
 conn.execute(ins, [
-    {'titolo': 'Titanic', 'durata': 195,
-        'descrizione': 'Titanic è un film del 1997 co-montato, co-prodotto, scritto e diretto da James Cameron.'},
-    {'titolo': 'The Wolf of Wall Street', 'durata': 180,
-     'descrizione': 'The Wolf of Wall Street è un film del 2013 diretto e prodotto da Martin Scorsese.'},
-    {'titolo': 'La Fabbrica di cioccolato', 'durata': 115,
-     'descrizione': 'La fabbrica di cioccolato (Charlie and the Chocolate Factory) è un film del 2005 diretto da Tim Burton'},
-    {'titolo': 'Troy', 'durata': 162,
-     'descrizione': 'Troy è un film del 2004 diretto da Wolfgang Petersen.'},
-    {'titolo': 'Top Gun', 'durata': 110,
-     'descrizione': 'Top Gun è un film d\'azione del 1986, diretto da Tony Scott '},
-    {'titolo': 'Mission: Impossible - Fallout', 'durata': 147,
-     'descrizione': 'Mission: Impossible - Fallout è un film del 2018 scritto e diretto da Christopher McQuarrie.'},
-    {'titolo': 'Skyfall', 'durata': 143,
-     'descrizione': 'Skyfall è un film del 2012 diretto da Sam Mendes.'},
-    {'titolo': 'The imitation game', 'durata': 113,
-     'descrizione': 'The Imitation Game è un film del 2014 diretto da Morten Tyldum.'}
+    {'titolo': 'Titanic', 'durata': 195, 'descrizione': 'Titanic è un film del 1997 co-montato, co-prodotto, scritto e diretto da James Cameron.'},
+    {'titolo': 'The Wolf of Wall Street', 'durata': 180, 'descrizione': 'The Wolf of Wall Street è un film del 2013 diretto e prodotto da Martin Scorsese.'},
+    {'titolo': 'La Fabbrica di cioccolato', 'durata': 115, 'descrizione': 'La fabbrica di cioccolato (Charlie and the Chocolate Factory) è un film del 2005 diretto da Tim Burton'},
+    {'titolo': 'Troy', 'durata': 162, 'descrizione': 'Troy è un film del 2004 diretto da Wolfgang Petersen.'},
+    {'titolo': 'Top Gun', 'durata': 110, 'descrizione': 'Top Gun è un film d\'azione del 1986, diretto da Tony Scott '},
+    {'titolo': 'Mission: Impossible - Fallout', 'durata': 147, 'descrizione': 'Mission: Impossible - Fallout è un film del 2018 scritto e diretto da Christopher McQuarrie.'},
+    {'titolo': 'Skyfall', 'durata': 143, 'descrizione': 'Skyfall è un film del 2012 diretto da Sam Mendes.'},
+    {'titolo': 'The imitation game', 'durata': 113, 'descrizione': 'The Imitation Game è un film del 2014 diretto da Morten Tyldum.'}
 ])
 
 ins = genere.insert()

@@ -159,7 +159,36 @@ def generate_all_film_next_projection():
     #from proiezioni pr
     #where pr .data = (select min("data" ) from proiezioni where "data" >= current_date and film = pr.film ) and pr .ora_inizio >= current_time
     #group by (film , "data" )
-    return None
+
+    proiezioni = meta.tables['proiezioni']
+    pr = meta.tables['proiezioni']
+    film = meta.tables['film']
+
+    j = film.join(proiezioni, film.c.id_film == proiezioni.c.film)
+
+    s = select([film.c.titolo, proiezioni.c.film, proiezione.c.ora_inizio, func.min(proiezioni.c.ora_inizio).alias("proz_proiezione")]).\
+        where(proiezioni.c.data) = (select(func.min(proiezioni.c.data).\
+                                    where(proiezioni.c.data >= func.current_date(), and_(proiezioni.c.film = pr.c.film, and_(proiezioni.c.ora_inizio >= func.current_date()))).\
+                                    group_by(proiezioni.c.film, proiezioni.c.data)))
+
+    conn = clienti_engine.connect()
+    result = conn.execute(s)
+
+    list_next_projection = []
+
+    for row in result:  # lista di dizionari
+        dict_next_projection = dict()
+        dict_next_projection["film"] = [row['film']]
+        dict_next_projection["titolo"] = [row['titolo']]
+        dict_next_projection["ora_inizio"] = [row['ora_inizio']]
+        dict_next_projection["durata"] = [row['durata']]
+        dict_next_projection["data"] = [row['data']]
+        dict_next_projection["sala"] = [row['sala']]
+        list_next_projection.append(dict_next_projection)
+
+    conn.close()
+    return list_next_projection
+
 
 # genera tutte le proiezioni previste per un determinato film
 def generate_all_projection_film(id):
@@ -804,9 +833,8 @@ def prenota_biglietto():
 @ app.route('/tutti_i_film')
 @ login_required
 def tutti_i_film():
-    return None
-    #dict = generate_all_film_next_projection()
-    # return render_template('UserTemplate/tutti_i_film.html', film_dict=dict_f, proiezioni_dict=dict_p)
+    dict = generate_all_film_next_projection()
+     return render_template('UserTemplate/tutti_i_film.html', next_projection=dict)
 
 #--------------------------------------------------------------------------------------------#
 # visualizziamo tutte le proiezioni in programma per un determinato film
@@ -814,7 +842,7 @@ def tutti_i_film():
 @ login_required
 def tutte_le_proiezioni():
     dict = generate_film_dict()
-    return render_template('UserTemplate/tutte_le_proiezioni.html', film_dict=dict)
+    return render_template('UserTemplate/tutte_le_proiezioni.html', film_dict_next=dict)
 
 #--------------------------------------------------------------------------------------------#
 # visualizziamo tutte le mie prenotazioni
