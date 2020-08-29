@@ -6,7 +6,7 @@
 # Descrizione: Creazione del database
 
 #---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---#
-from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String, Date, Time, Float, Boolean, Text, ForeignKey
+from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String, Date, Time, Float, Boolean, Text, ForeignKey, PrimaryKeyConstraint
 from sqlalchemy_utils import database_exists, create_database, drop_database
 from sqlalchemy.dialects.postgresql import ENUM
 
@@ -16,8 +16,8 @@ from sqlalchemy.dialects.postgresql import ENUM
 # api url: https://docs.sqlalchemy.org/en/13/dialects/postgresql.html#module-sqlalchemy.dialects.postgresql.psycopg2
 # engine = create_engine(
 # "postgres+psycopg2://postgres:ciao@serversrv.ddns.net:2345/progetto2020")
-#engine = create_engine("postgres+psycopg2://giulio:Giulio99:)@/progettobd")
-engine = create_engine("postgres+psycopg2://postgres:simone@localhost/progettobd")
+engine = create_engine("postgres+psycopg2://giulio:Giulio99:)@/progettobd")
+#engine = create_engine("postgres+psycopg2://postgres:simone@localhost/progettobd")
 
 # funzione di sqlalchemy_utils che, se non esiste l'url del database, lo crea
 if database_exists(engine.url):  # elimina se esiste e lo ricrea
@@ -82,12 +82,13 @@ proiezioni = Table('proiezioni', metadata,
                    )
 
 posti = Table('posti', metadata,
-              Column('id_posto', Integer, primary_key=True),
+              Column('id_posto', Integer, nullable=False),
               Column('prezzo', Float),
               Column('prenotato', String(320), ForeignKey(
                   "utenti.email", onupdate="CASCADE", ondelete="SET NULL")),
               Column('id_proiezione', Integer, ForeignKey(
-                  "proiezioni.id_proiezione", onupdate="CASCADE", ondelete="CASCADE"), nullable=False)
+                  "proiezioni.id_proiezione", onupdate="CASCADE", ondelete="CASCADE"), nullable=False),
+              PrimaryKeyConstraint('id_posto', 'id_proiezione', name='posti_pk')
               )
 
 attori = Table('attori', metadata,
@@ -152,14 +153,14 @@ conn.execute("GRANT anonimous TO anonim")
 conn.execute('''create or replace function refund() returns trigger as $refund$
                BEGIN
                    UPDATE utenti
-                   SET saldo = (SELECT saldo FROM utenti JOIN posti ON (utenti.email = posti.prenotato) WHERE posti.id_proiezione = old.id_proiezione) + (SELECT DISTINCT prezzo FROM posti)
+                   SET saldo = (SELECT saldo FROM utenti WHERE email = old.id_proiezione) + (SELECT DISTINCT prezzo FROM posti)
                    WHERE email = (SELECT prenotato FROM posti WHERE id_proiezione = old.id_proiezione);
                    RETURN NULL;
                END;
                $refund$ LANGUAGE plpgsql;''')
 
 conn.execute('''CREATE TRIGGER refund
-               AFTER DELETE ON proiezioni
+               BEFORE DELETE ON proiezioni
                FOR EACH ROW
                WHEN (OLD.data >= current_date AND OLD.ora_inizio > current_time)
                EXECUTE PROCEDURE refund()''')

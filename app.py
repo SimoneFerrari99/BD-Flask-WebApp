@@ -122,7 +122,7 @@ def generate_my_projection_dict():
 
     j = posti.join(proiezioni.join(film, proiezioni.c.film == film.c.id_film),
                    posti.c.id_proiezione == proiezioni.c.id_proiezione)
-    s = select([film.c.titolo, proiezioni.c.data, proiezioni.c.ora_inizio, proiezioni.c.sala, func.count().label('num_biglietti')]).\
+    s = select([proiezioni.c.id_proiezione, film.c.id_film, film.c.titolo, film.c.durata, film.c.descrizione, proiezioni.c.data, proiezioni.c.ora_inizio, proiezioni.c.sala, func.count().label('num_biglietti')]).\
         select_from(j).\
         where(and_(
             posti.c.prenotato == current_user.email,
@@ -134,7 +134,7 @@ def generate_my_projection_dict():
                     )
                )
         )).\
-        group_by(film.c.titolo, proiezioni.c.id_proiezione)
+        group_by(proiezioni.c.id_proiezione, film.c.id_film, film.c.titolo, film.c.durata, film.c.descrizione, proiezioni.c.id_proiezione)
 
     conn = clienti_engine.connect()
     result = conn.execute(s)
@@ -143,11 +143,15 @@ def generate_my_projection_dict():
 
     for row in result:  # lista di dizionari
         dict_projection = dict()
-        dict_projection["titolo"] = [row['titolo']]
-        dict_projection["data"] = [row['data']]
-        dict_projection["ora_inizio"] = [row['ora_inizio']]
-        dict_projection["sala"] = [row['sala']]
-        dict_projection["num_biglietti"] = [row['num_biglietti']]
+        dict_projection["id_film"] = row['id_film']
+        dict_projection["id_proiezione"] = row['id_proiezione']
+        dict_projection["titolo"] = row['titolo']
+        dict_projection["durata"] = row['durata']
+        dict_projection["descrizione"] = row['descrizione']
+        dict_projection["data"] = row['data']
+        dict_projection["ora_inizio"] = row['ora_inizio']
+        dict_projection["sala"] = row['sala']
+        dict_projection["num_biglietti"] = row['num_biglietti']
         list_all_projection.append(dict_projection)
 
     conn.close()
@@ -188,21 +192,22 @@ def generate_all_film_next_projection():
         group_by(film.c.titolo, pr.c.film, pr.c.data, film.c.durata, pr.c.sala)
 
     s = '''
-        select f.titolo, f.descrizione, f.durata, pr.sala, pr.film, pr."data" , min(pr.ora_inizio ) as "prox_proiezione"
+        select f.titolo, f.descrizione, f.durata, pr.id_proiezione, pr.sala, pr.film, pr."data" , min(pr.ora_inizio ) as "prox_proiezione"
         from proiezioni pr join film f on pr.film = f.id_film
         where pr.data = (select min("data" )
                      from proiezioni
                      where ("data" > current_date or ("data" = current_date and ora_inizio >= current_time)) and film = pr.film )
-        group by (f.titolo, f.descrizione, pr.film, pr."data", f.durata, pr.sala)
+        group by (f.titolo, f.descrizione, pr.film, pr.id_proiezione, pr."data", f.durata, pr.sala)
     '''
 
-    conn = clienti_engine.connect()
+    conn = anonim_engine.connect()
     result = conn.execute(s)
 
     list_next_projection = []
 
     for row in result:  # lista di dizionari
         dict_next_projection = dict()
+        dict_next_projection["id_proiezione"] = int(row["id_proiezione"])
         dict_next_projection["id_film"] = row['film']
         dict_next_projection["titolo"] = row['titolo']
         dict_next_projection["descrizione"] = row["descrizione"]
@@ -223,13 +228,13 @@ def generate_all_projection_film(id):
     j = film.join(proiezioni, film.c.id_film == proiezioni.c.film)  # JOIN
     s = select([film, proiezioni]).\
         select_from(j).\
-        where(or_(
+        where(and_(or_(
                 proiezioni.c.data > func.current_date(),
                 and_(
                     proiezioni.c.data == func.current_date(),
                     proiezioni.c.ora_inizio >= func.current_time()
                     )
-                )
+                ), film.c.id_film == id)
             )
     conn = clienti_engine.connect()
     result = conn.execute(s)
@@ -238,6 +243,9 @@ def generate_all_projection_film(id):
     for row in result:
         dict_projection = dict()
         dict_projection["id_proiezione"] = row["id_proiezione"]
+        dict_projection["descrizione"] = row["descrizione"]
+        dict_projection["durata"] = row["durata"]
+        dict_projection["id_film"] = row["id_film"]
         dict_projection["titolo"] = row["titolo"]
         dict_projection["data"] = row["data"]
         dict_projection["ora_inizio"] = row["ora_inizio"]
@@ -289,9 +297,6 @@ def home():
     proj_list = generate_all_film_next_projection()
     ordered_list = sorted(proj_list, key = lambda i: (i['data'], i['ora_inizio']))
     ordered_list = ordered_list[:5]
-    for dict in ordered_list:
-        print(str(dict["id_film"]))
-        print("\n")
     return render_template('home.html', proj_list=ordered_list, is_admin=admin)
 
 #--------------------------------------------------------------------------------------------#
@@ -351,8 +356,7 @@ def login(errore, messaggio):
 @ app.route('/logout')
 def logout():
     resp = make_response(redirect(url_for('home')))
-    if current_user.is_anonymous != False:
-        resp.set_cookie("userEmail", current_user.email, max_age=0)
+    resp.set_cookie("userEmail", "", max_age=0)
     logout_user()
     return resp
 
@@ -850,15 +854,67 @@ def ricarica_saldo():
         return render_template('UserTemplate/ricarica_saldo.html', saldo=saldo)
 
 #--------------------------------------------------------------------------------------------#
-@ app.route('/prenota_biglietto', methods=['GET', 'POST'])
+
+
+@ app.route('/prenota_biglietto/<id_pr>', methods=['GET', 'POST'])
 @ login_required
-def prenota_biglietto():
+def prenota_biglietto(id_pr):
     if request.method == "POST":
-        print(request.json)
+        scelti = request.json["posti"]
+        totale = float(request.json["totale"])
+        posti = meta.tables["posti"]
+        utenti = meta.tables["utenti"]
+        ins = posti.insert()
+
+        with clienti_engine.connect().execution_options(isolation_level="REPEATABLE READ") as conn:
+            trans = conn.begin()
+            try:
+                sel = select([utenti.c.saldo]).\
+                      where(utenti.c.email == current_user.email)
+                result = conn.execute(sel)
+                row = result.fetchone()
+                if row["saldo"] >= totale:
+                    for posto in scelti:
+                        values = {
+                            "id_posto": posto,
+                            "prezzo": 5.0,
+                            "prenotato": current_user.email,
+                            "id_proiezione": id_pr
+                        }
+                        conn.execute(ins, values)
+                    up = utenti.update().where(utenti.c.email == current_user.email)
+                    values = {
+                        "saldo": row["saldo"] - totale
+                    }
+                    conn.execute(up, values)
+                    trans.commit()
+                else:
+                    trans.rollback()
+                    return "Conflict", 409
+            except:
+                trans.rollback()
+                return "Conflict", 409
+            finally:
+                conn.close()
         return 'OK', 200
     else:
-        return render_template('UserTemplate/prenota_biglietto.html', errore=False, titolo="ciao")
-
+        film = meta.tables['film']
+        proiezioni = meta.tables['proiezioni']
+        j = film.join(proiezioni, film.c.id_film == proiezioni.c.film)  # JOIN
+        s = select([film, proiezioni]).\
+            select_from(j).\
+            where(proiezioni.c.id_proiezione == id_pr)
+        conn = clienti_engine.connect()
+        proiezione = conn.execute(s)
+        row = proiezione.fetchone()
+        posti = meta.tables["posti"]
+        s = select([posti.c.id_posto]).\
+            where(posti.c.id_proiezione == id_pr)
+        result = conn.execute(s)
+        occupati = []
+        for elem in result:
+            occupati.append(elem[0])
+        return render_template('UserTemplate/prenota_biglietto.html', rossi = occupati, titolo=row["titolo"], data=row["data"], ora=row["ora_inizio"], sala=row["sala"], id=id_pr)
 #--------------------------------------------------------------------------------------------#
 # visualizziamo tutti i film con la prossima proiezione in programma
 @ app.route('/tutti_i_film')
@@ -869,10 +925,11 @@ def tutti_i_film():
 
 #--------------------------------------------------------------------------------------------#
 # visualizziamo tutte le proiezioni in programma per un determinato film
-@app.route('/tutte_le_proiezioni')
-def tutte_le_proiezioni():
-    dict = generate_film_dict()
-    return render_template('UserTemplate/tutte_le_proiezioni.html', film_dict_next=dict)
+@app.route('/altre_date_film/<id_film>', methods=['GET', 'POST'])
+def altre_date_film(id_film):
+    dict = generate_all_projection_film(id_film)
+    string = "{{url_for('static', filename='copertine/" + id_film + ".jpg')}}"
+    return render_template('UserTemplate/altre_date_film.html', copertina = string, dict_film = dict )
 
 #--------------------------------------------------------------------------------------------#
 # visualizziamo tutte le mie prenotazioni
@@ -880,6 +937,7 @@ def tutte_le_proiezioni():
 @ login_required
 def le_mie_prenotazioni():
     dict = generate_my_projection_dict()
-    return render_template('UserTemplate/le_mie_prenotazioni.html', projection_dict=dict)
+    ordered_list = sorted(dict, key = lambda i: (i['data'], i['ora_inizio']))
+    return render_template('UserTemplate/le_mie_prenotazioni.html', projection_dict=ordered_list)
 
 #--------------------------------------------------------------------------------------------#

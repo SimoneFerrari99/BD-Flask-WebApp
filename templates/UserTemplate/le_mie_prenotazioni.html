@@ -28,18 +28,18 @@
 <input style="margin-left: 1.4em;" type="button" onclick="location.href='/dashboard_account';" value="Il mio account" />
 
 <h2>Le tue prenotazioni</h2>
-{% for id_film, elem_list in projection_dict.items() %}
+{% for dict in projection_dict %}
   <div style="float:left">
-    <img src="static/copertine/{{ id_film }}.jpg" height="200" width="150" alt="copertina di {{ elem_list[0] }}">
+    <img src="static/copertine/{{ dict['id_film'] }}.jpg" height="200" width="150" alt="copertina di {{ dict['titolo'] }}">
   </div>
   <div style="float:left">
-    <h3 id="titolo">Titolo: {{ elem_list[0] }}</h3>
-    <h4 id="durata">Durata: {{ elem_list[1] }} minuti</h4>
-    <p id="descrizione">{{ elem_list[2] }}</p>
-    <h3 style="margin-top: 1em;" id="Proiezione">Proiezione: [Giorno] [Ora] [Sala]</h3>
-    <h4 style="margin-top: 1em;" id="NumBiglietti">Numero di biglietti prenotati: [numBiglietti]</h4>
+    <h3 id="titolo">{{ dict["titolo"] }}</h3>
+    <h4 id="durata">{{ dict["durata"] }} minuti</h4>
+    <p id="descrizione">{{ dict["descrizione"] }}</p>
+    <h3 style="margin-top: 1em;" id="Proiezione">Proiezione: &nbsp; {{ dict["data"] }} &nbsp;&nbsp; {{ dict["ora_inizio"] }} &nbsp;&nbsp; Sala: {{ dict["sala"] }}</h3>
+    <h4 style="margin-top: 1em;" id="NumBiglietti">Numero di biglietti prenotati: {{ dict["num_biglietti"] }}</h4>
 
-    <input style="margin-left: 1.4em;" type="button" onclick="location.href='/prenota_biglietto';" value="Prenota altri biglietti per questa proiezione" />
+    <input style="margin-left: 1.4em;" type="button" onclick="location.href='/prenota_biglietto/{{ dict['id_proiezione'] }}';" value="Prenota altri posti" />
 
   </div>
   <div style="clear:both"/>

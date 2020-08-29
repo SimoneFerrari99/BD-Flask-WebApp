@@ -1,13 +1,17 @@
 let importo = 0;
 let posti_sel = [];
 
+function alertError(messaggio) {
+  alert(messaggio);
+}
+
 function selezionaPosto(id){
   posti_sel.push(id);
   importo += 5;
   let totale = document.getElementById("importo");
   totale.innerHTML = importo + ".0€";
   let bottone = document.getElementById(id);
-  bottone.style.backgroundColor = "red";
+  bottone.style.backgroundColor = "blue";
   bottone.setAttribute( "onClick", "deselezionaPosto(id)");
 }
 
@@ -21,20 +25,27 @@ function deselezionaPosto(id){
   bottone.setAttribute( "onClick", "selezionaPosto(id)");
 }
 
-function invia(){
+function invia(id_proiezione){
 
   let prenotazione = {
     posti: posti_sel,
     totale: importo
   };
-  fetch("/prenota_biglietto",{
+  id = parseInt(id_proiezione);
+  fetch("/prenota_biglietto/"+id,{
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(prenotazione)
   }).then(function (response){
     return response.text();
   }).then(function (text){
-    window.location.href = "/";
+    if(text.localeCompare("Conflict") == 0){
+      alertError("Saldo insufficiente, prego ricaricare il saldo.");
+      window.location.href = "/ricarica_saldo";
+    }
+    else{
+      window.location.href = "/prenota_biglietto/"+id;
+    }
   }).catch(function (error){
     console.error(error);
   });

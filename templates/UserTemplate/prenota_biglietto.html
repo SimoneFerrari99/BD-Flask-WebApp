@@ -17,16 +17,6 @@
 </style>
 
 
-
-{% if errore%}
-<script>
-	function alertError(messaggio) {
-		alert(messaggio);
- 	}
- 	alertError({{error_message|tojson}})
-</script>
-{% endif %}
-
 <input
 	style="margin-left: 1.4em;"
  	type="button"
@@ -56,16 +46,20 @@
 <script src="{{url_for('static', filename='prenota_biglietto.js')}}"></script>
 <br>
 <h3 id="film">Film: {{titolo}}</h3>
-<h3 name="proiezione" id="id_proiezione">Film: {{titolo}}</h3>
+<h3 name="proiezione" id="id_proiezione">Proiezione: {{data}} {{ora}} Sala: {{sala}}</h3>
 
 <h4>Seleziona i posti a sedere:</h4>
 {% for i in range(150) %}
-<button type="button" class="posti" id={{i+1}} onclick="selezionaPosto(id)" style="background-color:green; border:none; padding: 16px; margin-top:10px; border-radius: 8px; outline:none;"></button>
+{% if (i + 1) in rossi %}
+	<button type="button" class="posti" id={{i+1}} style="background-color:red; border:none; padding: 16px; margin-top:10px; border-radius: 8px; outline:none;"></button>
+{% else %}
+	<button type="button" class="posti" id={{i+1}} onclick="selezionaPosto(id)" style="background-color:green; border:none; padding: 16px; margin-top:10px; border-radius: 8px; outline:none;"></button>
+{% endif %}
 {% if (i + 1) is divisibleby 15 %}
 <br>
 {% endif %}
 {% endfor %}
 <h3>Importo previsto: <div id="importo">0.0€</div><h3>
-<button type="button" name="invia" onclick="invia()">Conferma acquisto</button>
+<button type="button" name="invia" onclick="invia({{id}})">Conferma acquisto</button>
 
 {% endblock %}
