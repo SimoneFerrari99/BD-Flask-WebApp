@@ -29,6 +29,8 @@ conn.execute(ins, [
      {'nome': 'Alessandro', 'cognome': 'Pagnotto', 'data_nascita': '1982-02-23', 'email': 'alessandropagnotto@gmail.com', 'password': '$2b$12$m9JHWemug09LRHexku4ofOxpE4mAOg..2RJrUuYfh7StQ4Tf3zSvW', 'is_admin': False, 'is_manager': False, 'saldo': '30.0'},
      {'nome': 'Nicola', 'cognome': 'Pugliesi', 'data_nascita': '1998-01-08', 'email': 'nicolapugliesi@gmail.com', 'password': '$2b$12$m9JHWemug09LRHexku4ofOxpE4mAOg..2RJrUuYfh7StQ4Tf3zSvW', 'is_admin': False, 'is_manager': False, 'saldo': '10.0'},
 
+     {'nome': 'Francesca', 'cognome': 'Rossi', 'data_nascita': '1972-07-10', 'email': 'francescarossi@gmail.com', 'password': '$2b$12$m9JHWemug09LRHexku4ofOxpE4mAOg..2RJrUuYfh7StQ4Tf3zSvW', 'is_admin': False, 'is_manager': False, 'saldo': '0.0'},
+     {'nome': 'Marco', 'cognome': 'Vianello', 'data_nascita': '1984-08-12', 'email': 'marcovianello@gmail.com', 'password': '$2b$12$m9JHWemug09LRHexku4ofOxpE4mAOg..2RJrUuYfh7StQ4Tf3zSvW', 'is_admin': False, 'is_manager': False, 'saldo': '0.0'},
 ])
 
 ins = film.insert()
@@ -222,19 +224,44 @@ conn.execute(ins, [
 ])
 
 
-#ins = posti.insert()
-#conn.execute(ins, [
-#        {'id_posto': 44, 'prezzo': 5, 'prenotato': 'simoneferrari@gmail.com', 'proiezioni': 25},
-#        {'id_posto': 45, 'prezzo': 5, 'prenotato': 'simoneferrari@gmail.com', 'proiezioni': 25},
-#        {'id_posto': 46, 'prezzo': 5, 'prenotato': 'simoneferrari@gmail.com', 'proiezioni': 25},
-#        {'id_posto': 60, 'prezzo': 5, 'prenotato': 'giuliotrolese@gmail.com', 'proiezioni': 25},
-#        {'id_posto': 61, 'prezzo': 5, 'prenotato': 'giuliotrolese@gmail.com', 'proiezioni': 25},
-#        {'id_posto': 62, 'prezzo': 5, 'prenotato': 'giuliotrolese@gmail.com', 'proiezioni': 25},
-#        {'id_posto': 63, 'prezzo': 5, 'prenotato': 'giuliotrolese@gmail.com', 'proiezioni': 25},
-#        {'id_posto': 21, 'prezzo': 5, 'prenotato': 'giuliocasarotti@gmail.com', 'proiezioni': 25},
-#        {'id_posto': 22, 'prezzo': 5, 'prenotato': 'giuliocasarotti@gmail.com', 'proiezioni': 25},
+ins = posti.insert()
+conn.execute(ins, [
+        {'id_posto': 100, 'prezzo': 5, 'prenotato': 'nicolapugliesi@gmail.com', 'id_proiezione': 20},
+        {'id_posto': 101, 'prezzo': 5, 'prenotato': 'nicolapugliesi@gmail.com', 'id_proiezione': 20},
+        {'id_posto': 80, 'prezzo': 5, 'prenotato': 'francescarossi@gmail.com', 'id_proiezione': 20},
+        {'id_posto': 25, 'prezzo': 5, 'prenotato': 'francescarossi@gmail.com', 'id_proiezione': 20},
+        {'id_posto': 26, 'prezzo': 5, 'prenotato': 'marcovianello@gmail.com', 'id_proiezione': 20},
+        {'id_posto': 44, 'prezzo': 5, 'prenotato': 'alessandropagnotto@gmail.com', 'id_proiezione': 20},
+        {'id_posto': 45, 'prezzo': 5, 'prenotato': 'alessandropagnotto@gmail.com', 'id_proiezione': 20},
+        {'id_posto': 46, 'prezzo': 5, 'prenotato': 'alessandropagnotto@gmail.com', 'id_proiezione': 20},
 
-#])
+        {'id_posto': 20, 'prezzo': 5, 'prenotato': 'irenebianchi@gmail.com', 'id_proiezione': 21},
+        {'id_posto': 21, 'prezzo': 5, 'prenotato': 'irenebianchi@gmail.com', 'id_proiezione': 21},
+        {'id_posto': 43, 'prezzo': 5, 'prenotato': 'alessandropagnotto@gmail.com', 'id_proiezione': 21},
+        {'id_posto': 44, 'prezzo': 5, 'prenotato': 'alessandropagnotto@gmail.com', 'id_proiezione': 21},
+        {'id_posto': 56, 'prezzo': 5, 'prenotato': 'nicolapugliesi@gmail.com', 'id_proiezione': 21},
+        {'id_posto': 55, 'prezzo': 5, 'prenotato': 'nicolapugliesi@gmail.com', 'id_proiezione': 21},
+        {'id_posto': 70, 'prezzo': 5, 'prenotato': 'francescarossi@gmail.com', 'id_proiezione': 21},
+
+        {'id_posto': 71, 'prezzo': 5, 'prenotato': 'francescarossi@gmail.com', 'id_proiezione': 22},
+        {'id_posto': 11, 'prezzo': 5, 'prenotato': 'marcovianello@gmail.com', 'id_proiezione': 22},
+        {'id_posto': 12, 'prezzo': 5, 'prenotato': 'irenebianchi@gmail.com', 'id_proiezione': 22},
+        {'id_posto': 67, 'prezzo': 5, 'prenotato': 'irenebianchi@gmail.com', 'id_proiezione': 22},
+        {'id_posto': 115, 'prezzo': 5, 'prenotato': 'alessandropagnotto@gmail.com', 'id_proiezione': 22},
+
+        {'id_posto': 114, 'prezzo': 5, 'prenotato': 'alessandropagnotto@gmail.com', 'id_proiezione': 23},
+        {'id_posto': 113, 'prezzo': 5, 'prenotato': 'nicolapugliesi@gmail.com', 'id_proiezione': 23},
+        {'id_posto': 78, 'prezzo': 5, 'prenotato': 'nicolapugliesi@gmail.com', 'id_proiezione': 23},
+        {'id_posto': 79, 'prezzo': 5, 'prenotato': 'francescarossi@gmail.com', 'id_proiezione': 23},
+        {'id_posto': 90, 'prezzo': 5, 'prenotato': 'francescarossi@gmail.com', 'id_proiezione': 23},
+
+        {'id_posto': 56, 'prezzo': 5, 'prenotato': 'marcovianello@gmail.com', 'id_proiezione': 24},
+        {'id_posto': 55, 'prezzo': 5, 'prenotato': 'irenebianchi@gmail.com', 'id_proiezione': 24},
+        {'id_posto': 34, 'prezzo': 5, 'prenotato': 'irenebianchi@gmail.com', 'id_proiezione': 24},
+        {'id_posto': 33, 'prezzo': 5, 'prenotato': 'alessandropagnotto@gmail.com', 'id_proiezione': 24},
+        {'id_posto': 32, 'prezzo': 5, 'prenotato': 'alessandropagnotto@gmail.com', 'id_proiezione': 24}
+
+])
 
 
 ins = attori.insert()
@@ -254,7 +281,7 @@ conn.execute(ins, [
     {'id_persona': 23, 'id_film': 11},
     {'id_persona': 19, 'id_film': 11},
     {'id_persona': 7, 'id_film': 12},
-    {'id_persona': 12, 'id_film': 12},
+    {'id_persona': 11, 'id_film': 12},
     {'id_persona': 20, 'id_film': 13},
     {'id_persona': 25, 'id_film': 13},
     {'id_persona': 24, 'id_film': 14},
@@ -281,7 +308,7 @@ conn.execute(ins, [
     {'id_persona': 25, 'id_film': 10},
     {'id_persona': 17, 'id_film': 11},
     {'id_persona': 21, 'id_film': 12},
-    {'id_persona': 20, 'id_film': 13},
+    {'id_persona': 18, 'id_film': 13},
     {'id_persona': 7, 'id_film': 13},
     {'id_persona': 24, 'id_film': 14},
     {'id_persona': 12, 'id_film': 14},

@@ -13,7 +13,6 @@ from sqlalchemy.sql import func, and_, or_, not_
 from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user, current_user
 import json
 from PIL import Image
-
 # from user_route import user_app
 # from admin_route import admin_app
 
@@ -45,6 +44,17 @@ manager_engine = create_engine("postgres+psycopg2://manager:passwordmanager@loca
 meta = MetaData(admin_engine)
 meta.reflect()
 
+utenti = meta.tables['utenti']
+posti = meta.tables['posti']
+proiezioni = meta.tables['proiezioni']
+sale = meta.tables['sale']
+film = meta.tables['film']
+genere_film = meta.tables['genere_film']
+genere = meta.tables['genere']
+registi = meta.tables['registi']
+attori = meta.tables['attori']
+persone = meta.tables['persone']
+
 #--------------------------------------------------------------------------------------------#
 #--------------------------------------------------------------------------------------------#
 #--------------------------------------------------------------------------------------------#
@@ -61,7 +71,6 @@ def is_in(dict_list, id_film):
 
 # generatore di un dizionario per le persone
 def generate_persone_dict():
-    persone = meta.tables['persone']
     s = select([persone])
     conn = anonim_engine.connect()
     result = conn.execute(s)
@@ -73,7 +82,6 @@ def generate_persone_dict():
 
  # generatore di un dizionario per i film
 def generate_film_dict():
-    film = meta.tables['film']
     s = select([film])
     conn = anonim_engine.connect()
     result = conn.execute(s)
@@ -86,7 +94,6 @@ def generate_film_dict():
 
 # generatore di un dizionario per i generi
 def generate_generi_dict():
-    genere = meta.tables['genere']
     s = select([genere])
     conn = anonim_engine.connect()
     result = conn.execute(s)
@@ -98,7 +105,6 @@ def generate_generi_dict():
 
 # generatore di un dizionario per le sale
 def generate_sale_list():
-    sale = meta.tables['sale']
     s = select([sale])
     conn = anonim_engine.connect()
     result = conn.execute(s)
@@ -118,15 +124,6 @@ def errore_admin():
 
 # Genera una lista contenente tutte le mie proiezioni
 def generate_my_projection_dict():
-    # SELECT f.titolo, pr.data, pr.ora_inizio, pr.sala, COUNT(*) as NumBiglietti
-    # FROM posti po JOIN proiezioni pr ON po.id_proiezione = pr.id_proiezione JOIN film f ON pr.film = f.id_film
-    # WHERE po.prenotato = current_user.email AND pr.data >= current_date AND pr.ora_inizio >= current_time
-    # GROUP BY pr.id_proiezione
-
-    posti = meta.tables['posti']
-    proiezioni = meta.tables['proiezioni']
-    film = meta.tables['film']
-
     j = posti.join(proiezioni.join(film, proiezioni.c.film == film.c.id_film),
                    posti.c.id_proiezione == proiezioni.c.id_proiezione)
     s = select([proiezioni.c.id_proiezione, film.c.id_film, film.c.titolo, film.c.durata, film.c.descrizione, proiezioni.c.data, proiezioni.c.ora_inizio, proiezioni.c.sala, func.count().label('num_biglietti')]).\
@@ -166,11 +163,7 @@ def generate_my_projection_dict():
 
 # genera una lista contenente la propiezione più recente per ogni film
 def generate_all_film_next_projection():
-    proiezioni = meta.tables['proiezioni']
     pr = meta.tables['proiezioni']
-    film = meta.tables['film']
-
-
     s = '''
         select f.titolo, gf.tipo_genere, f.descrizione, f.durata, pr.id_proiezione, pr.sala, pr.film, pr."data" , min(pr.ora_inizio ) as "prox_proiezione"
         from proiezioni pr join film f on pr.film = f.id_film join genere_film gf on f.id_film = gf.id_film
@@ -204,8 +197,6 @@ def generate_all_film_next_projection():
 
 # genera tutte le proiezioni previste per un determinato film
 def generate_all_projection_film(id):
-    film = meta.tables['film']
-    proiezioni = meta.tables['proiezioni']
     j = film.join(proiezioni, film.c.id_film == proiezioni.c.film)  # JOIN
     s = select([film, proiezioni]).\
         select_from(j).\
@@ -237,8 +228,6 @@ def generate_all_projection_film(id):
 
 # genera tutte le proiezioni future per tutti i film
 def generate_all_projection():
-    film = meta.tables['film']
-    proiezioni = meta.tables['proiezioni']
     j = film.join(proiezioni, film.c.id_film == proiezioni.c.film)  # JOIN
     s = select([film, proiezioni]).\
         select_from(j).\
@@ -381,7 +370,6 @@ def aggiungi_persona():
             nome = request.form["nome"]
             cognome = request.form["cognome"]
 
-            persone = meta.tables['persone']  # prendo la tabella
             ins = persone.insert()  # prendo la insert
             values = {  # dizionario per i valori
                 'nome': nome,
@@ -413,7 +401,6 @@ def aggiungi_film():
             durata = request.form["durata"]
             descrizione = request.form["descrizione"]
 
-            film = meta.tables["film"]  # prendo la tabella
             ins = film.insert()  # prendo la insert
             values = {  # dizionario per i valori
                 'titolo': titolo,
@@ -471,9 +458,6 @@ def aggiungi_film():
 
             conn = manager_engine.connect()
             # prendo le tre tabelle
-            attori = meta.tables["attori"]
-            registi = meta.tables["registi"]
-            genere_film = meta.tables["genere_film"]
 
             # per ogni elemento del form (non so quanti siano di preciso...)
             for elem in request.form:
@@ -529,8 +513,15 @@ def aggiungi_admin():
             email = request.form["email"]
             psw = request.form["psw"]
             conferma = request.form["conferma_password"]
+            type_admin = request.form["type"]
 
-            utenti = meta.tables['utenti']
+            if type_admin == "admin":
+                is_admin = True
+                is_manager = True
+            else:
+                is_admin = False
+                is_manager = True
+
             s = select([utenti]).where(
                 utenti.c.email == email
             )
@@ -555,7 +546,8 @@ def aggiungi_admin():
                     'data_nascita': data_nascita,
                     'email': email,
                     'password': hashed_psw,
-                    'is_admin': True,
+                    'is_admin': is_admin,
+                    'is_manager': is_manager,
                     'saldo': 0.0
                 }
                 conn = admin_engine.connect()  # mi connetto
@@ -576,7 +568,6 @@ def riepilogo_sale():
         if request.method == 'POST':
             n_posti = 150  # per semplicità, tutte le nostre sale hanno 150 posti
 
-            sale = meta.tables['sale']  # prendo la tabella
             ins = sale.insert()  # prendo la insert
             values = {  # dizionario per i valori
                 'n_posti': n_posti,
@@ -597,7 +588,6 @@ def aggiungi_proiezione():
     if(current_user.is_manager == True):
         if request.method == 'POST':
             film = request.form["film"]
-            proiezioni = meta.tables['proiezioni']
             ins = proiezioni.insert()
             conn = manager_engine.connect()
             row = dict()
@@ -633,7 +623,6 @@ def aggiungi_genere():
             # prendiamo i dati dal form
             tipo = request.form["tipo"]
 
-            genere = meta.tables['genere']  # prendo la tabella
 
             s = select([genere]).where(genere.c.tipo == tipo)
             conn = manager_engine.connect()
@@ -667,7 +656,6 @@ def rimuovi_film():
                 # prendiamo i dati dal form
                 id_film = request.form["film"]
 
-                film = meta.tables["film"]  # prendo la tabella
 
                 rem = film.delete().where(film.c.id_film == id_film)
                 conn = admin_engine.connect()  # mi connetto
@@ -692,7 +680,6 @@ def rimuovi_proiezione():
                 # prendiamo i dati dal form
                 id_pr = request.form["proiezione"]
 
-                proiezioni = meta.tables["proiezioni"]  # prendo la tabella
 
                 rem = proiezioni.delete().where(proiezioni.c.id_proiezione == id_pr)
                 conn = admin_engine.connect()  # mi connetto
@@ -707,31 +694,11 @@ def rimuovi_proiezione():
     else:
         return errore_admin()
 
+
 @ app.route('/statistiche')
 @ login_required
 def statistiche():
-    '''
-    numero di film:
-        select count(*) as numfilm
-        from film
-
-    film con più proiezioni:
-        create or replace view num_pr_film(id_film, num_proiezioni) as
-        select id_film, count(id_proiezione)
-        from film left join proiezioni on film.id_film = proiezioni .film
-        group by id_film
-
-        select *
-        from film f natural join num_pr_film n
-        where n.num_proiezioni = (select max(num_proiezioni) from num_pr_film )
-
-    film con più posti prenotati totali:
-        create or replace view num_posti_pr_film(id_film, num_posti) as
-        select id_film, count(id_posto)
-        from film left join proiezioni on film.id_film = proiezioni .film natural join posti
-        group by id_film
-    '''
-    return render_template('AdminTemplate/statistiche.html');
+    return render_template('AdminTemplate/statistiche.html')
 
 #--------------------------------------------------------------------------------------------#
 #--------------------------------------------------------------------------------------------#
@@ -752,7 +719,6 @@ def registrazione():
         psw = request.form["psw"]
         conferma = request.form["conferma_password"]
 
-        utenti = meta.tables['utenti']
         s = select([utenti]).where(
             utenti.c.email == email
         )
@@ -794,7 +760,6 @@ def registrazione():
 @ login_required
 def dashboard_account():
 
-    utenti = meta.tables['utenti']
     s = select([utenti]).where(utenti.c.email == current_user.email)
 
     conn = clienti_engine.connect()
@@ -820,7 +785,6 @@ def cambia_password():
         psw = request.form["psw"]
         conferma = request.form["conferma_password"]
 
-        utenti = meta.tables["utenti"]
         conn = clienti_engine.connect()
 
         psw_ceck = bcrypt.check_password_hash(current_user.password, old_psw)
@@ -851,7 +815,6 @@ def cambia_password():
 @ app.route('/ricarica_saldo', methods=['GET', 'POST'])
 @ login_required
 def ricarica_saldo():
-    utenti = meta.tables['utenti']
     s = select([utenti]).where(utenti.c.email == current_user.email)
     conn = clienti_engine.connect()
     result = conn.execute(s)
@@ -880,9 +843,8 @@ def prenota_biglietto(id_pr):
     if request.method == "POST":
         scelti = request.json["posti"]
         totale = float(request.json["totale"])
-        posti = meta.tables["posti"]
-        utenti = meta.tables["utenti"]
         ins = posti.insert()
+
 
         with clienti_engine.connect().execution_options(isolation_level="REPEATABLE READ") as conn:
             trans = conn.begin()
@@ -895,7 +857,7 @@ def prenota_biglietto(id_pr):
                     for posto in scelti:
                         values = {
                             "id_posto": posto,
-                            "prezzo": 5.0,
+                            "prezzo": 5,
                             "prenotato": current_user.email,
                             "id_proiezione": id_pr
                         }
@@ -916,8 +878,6 @@ def prenota_biglietto(id_pr):
                 conn.close()
         return 'OK', 200
     else:
-        film = meta.tables['film']
-        proiezioni = meta.tables['proiezioni']
         j = film.join(proiezioni, film.c.id_film == proiezioni.c.film)  # JOIN
         s = select([film, proiezioni]).\
             select_from(j).\
@@ -925,7 +885,6 @@ def prenota_biglietto(id_pr):
         conn = clienti_engine.connect()
         proiezione = conn.execute(s)
         row = proiezione.fetchone()
-        posti = meta.tables["posti"]
         s = select([posti.c.id_posto]).\
             where(posti.c.id_proiezione == id_pr)
         result = conn.execute(s)
