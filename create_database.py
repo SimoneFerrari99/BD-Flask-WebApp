@@ -16,8 +16,8 @@ from sqlalchemy.dialects.postgresql import ENUM
 # api url: https://docs.sqlalchemy.org/en/13/dialects/postgresql.html#module-sqlalchemy.dialects.postgresql.psycopg2
 # engine = create_engine(
 # "postgres+psycopg2://postgres:ciao@serversrv.ddns.net:2345/progetto2020")
-engine = create_engine("postgres+psycopg2://giulio:Giulio99:)@/progettobd")
-#engine = create_engine("postgres+psycopg2://postgres:simone@localhost/progettobd")
+#engine = create_engine("postgres+psycopg2://giulio:Giulio99:)@/progettobd")
+engine = create_engine("postgres+psycopg2://postgres:simone@localhost/progettobd")
 
 # funzione di sqlalchemy_utils che, se non esiste l'url del database, lo crea
 if database_exists(engine.url):  # elimina se esiste e lo ricrea
@@ -31,20 +31,21 @@ metadata = MetaData()  # oggetto su cui vengono salvate le tabelle
 #---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---#
 
 utenti = Table('utenti', metadata,
-               Column('nome', String(255)),
-               Column('cognome', String(255)),
+               Column('nome', String(255), nullable = False),
+               Column('cognome', String(255), nullable = False),
                Column('data_nascita', Date),
                # String(320) perchè lo standard prevede 64 per il nome utente, @, 255 caratteri per il dominio
                Column('email', String(320), primary_key=True),
                # la nostra password verrà criptata tramite flask-bcrypt, 60 è una lunghezza di default di bycript
                Column('password', String(60), nullable=False),
                Column('is_admin', Boolean),
+               Column('is_manager', Boolean),
                Column('saldo', Float)
                )
 
 film = Table('film', metadata,
              Column('id_film', Integer, primary_key=True),
-             Column('titolo', String(255)),
+             Column('titolo', String(255), nullable = False),
              Column('durata', Integer),
              Column('descrizione', Text),
              )
@@ -55,7 +56,7 @@ genere = Table('genere', metadata,
 
 persone = Table('persone', metadata,
                 Column('id_persona', Integer, primary_key=True),
-                Column('nome', String(255)),
+                Column('nome', String(255), nullable = False),
                 Column('cognome', String(255))
                 )
 
@@ -119,18 +120,22 @@ conn = engine.connect()
 
 
 conn.execute("DROP USER IF EXISTS admin")
+conn.execute('DROP USER IF EXISTS manager')
 conn.execute("DROP USER IF EXISTS cliente")
 conn.execute("DROP USER IF EXISTS anonim")
 
 conn.execute("CREATE USER admin WITH PASSWORD 'passwordadmin'")
+conn.execute("CREATE USER manager WITH PASSWORD 'passwordmanager'")
 conn.execute("CREATE USER cliente WITH PASSWORD 'passwordcliente'")
 conn.execute("CREATE USER anonim WITH PASSWORD 'passwordanonim'")
 
 conn.execute("DROP ROLE IF EXISTS superuser")
+conn.execute("DROP ROLE IF EXISTS managers")
 conn.execute("DROP ROLE IF EXISTS clienti")
 conn.execute("DROP ROLE IF EXISTS anonimous")
 
 conn.execute("CREATE ROLE superuser WITH SUPERUSER CREATEDB CREATEROLE LOGIN")
+conn.execute("CREATE ROLE managers WITH SUPERUSER LOGIN")
 conn.execute("CREATE ROLE clienti WITH LOGIN")
 conn.execute("CREATE ROLE anonimous WITH LOGIN")
 
@@ -141,11 +146,18 @@ conn.execute("GRANT INSERT ON posti TO clienti")
 conn.execute("GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO superuser")
 conn.execute("GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO superuser")
 
+conn.execute("GRANT SELECT ON ALL TABLES IN SCHEMA public TO managers")
+conn.execute("GRANT UPDATE ON ALL TABLES IN SCHEMA public TO managers")
+conn.execute("GRANT INSERT ON ALL TABLES IN SCHEMA public TO managers")
+conn.execute("GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO managers")
+
+
 conn.execute("GRANT SELECT ON ALL TABLES IN SCHEMA public TO anonimous")
 conn.execute("GRANT INSERT ON utenti TO anonimous")
 
 
 conn.execute("GRANT superuser TO admin")
+conn.execute("GRANT managers TO manager")
 conn.execute("GRANT clienti TO cliente")
 conn.execute("GRANT anonimous TO anonim")
 
@@ -167,12 +179,3 @@ conn.execute('''CREATE TRIGGER refund
                FOR EACH ROW
                WHEN (OLD.data > current_date OR (OLD.data = current_date AND OLD.ora_inizio > current_time))
                EXECUTE PROCEDURE refund()''')
-
-
-# conn.execute([{"CREATE ROLE admin"}
-#              {"CREATE ROLE customer"}])
-
-# conn.execute()
-
-
-# GRANT ALL PRIVILEGES ON DATABASE progettobd TO admin;

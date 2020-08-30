@@ -38,6 +38,7 @@ login_manager.init_app(app)
 anonim_engine = create_engine("postgres+psycopg2://anonim:passwordanonim@localhost/progettobd")
 clienti_engine = create_engine("postgres+psycopg2://cliente:passwordcliente@localhost/progettobd")
 admin_engine = create_engine("postgres+psycopg2://admin:passwordadmin@localhost/progettobd")
+manager_engine = create_engine("postgres+psycopg2://manager:passwordmanager@localhost/progettobd")
 # engine = create_engine("postgres+psycopg2://postgres:simone@localhost/progettobd")
 
 # prendiamo i metadata dell'engine
@@ -52,6 +53,12 @@ meta.reflect()
 
 #---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---#
 # Funioni utili
+def is_in(dict_list, id_film):
+    for dict in dict_list:
+        if id_film == dict["id_film"]:
+            return True
+    return False
+
 # generatore di un dizionario per le persone
 def generate_persone_dict():
     persone = meta.tables['persone']
@@ -159,45 +166,18 @@ def generate_my_projection_dict():
 
 # genera una lista contenente la propiezione più recente per ogni film
 def generate_all_film_next_projection():
-    #select film, "data" ,min(ora_inizio )
-    #from proiezioni pr
-    #where pr.data = (select min("data" )
-    #                  from proiezioni
-    #                  where ("data" > current_date or ("data" == current_date and pr.ora_inizio >= current_time)) and film = pr.film )
-    #group by (film , "data" )
-
     proiezioni = meta.tables['proiezioni']
     pr = meta.tables['proiezioni']
     film = meta.tables['film']
 
-#    j = film.join(proiezioni, proiezioni.c.film == film.c.id_film)
-#
-#    s1 = select([film.c.titolo, film.c.durata, pr.c.sala, pr.c.film, pr.c.data, func.min(pr.c.ora_inizio).label("prox_proiezione")]).\
-#        select_from(j).\
-#        where(pr.c.data == (select([func.min(proiezioni.c.data)]).\
-#                            where(
-#                                and_(
-#                                    or_(
-#                                        proiezioni.c.data > func.current_date(),
-#                                        and_(
-#                                            proiezioni.c.data == func.current_date(),
-#                                            proiezioni.c.ora_inizio >= func.current_time()
-#                                            )
-#                                        ),
-#                                     proiezioni.c.film == pr.c.film
-#                                    )
-#                                 )
-#                            )
-#        ).\
-#        group_by(film.c.titolo, pr.c.film, pr.c.data, film.c.durata, pr.c.sala)
 
     s = '''
-        select f.titolo, f.descrizione, f.durata, pr.id_proiezione, pr.sala, pr.film, pr."data" , min(pr.ora_inizio ) as "prox_proiezione"
-        from proiezioni pr join film f on pr.film = f.id_film join
-        where pr.data = (select min("data" )
+        select f.titolo, gf.tipo_genere, f.descrizione, f.durata, pr.id_proiezione, pr.sala, pr.film, pr."data" , min(pr.ora_inizio ) as "prox_proiezione"
+        from proiezioni pr join film f on pr.film = f.id_film join genere_film gf on f.id_film = gf.id_film
+        where pr.data = (select min("data")
                          from proiezioni
                          where ("data" > current_date or ("data" = current_date and ora_inizio >= current_time)) and film = pr.film )
-        group by (f.titolo, f.descrizione, pr.film, pr.id_proiezione, pr."data", f.durata, pr.sala)
+        group by (f.titolo, gf.tipo_genere, f.descrizione, pr.film, pr.id_proiezione, pr."data", f.durata, pr.sala)
     '''
 
     conn = anonim_engine.connect()
@@ -209,6 +189,7 @@ def generate_all_film_next_projection():
         dict_next_projection = dict()
         dict_next_projection["id_proiezione"] = int(row["id_proiezione"])
         dict_next_projection["id_film"] = row['film']
+        dict_next_projection["genere"] = row["tipo_genere"]
         dict_next_projection["titolo"] = row['titolo']
         dict_next_projection["descrizione"] = row["descrizione"]
         dict_next_projection["ora_inizio"] = str(row['prox_proiezione'])
@@ -292,21 +273,32 @@ def generate_all_projection():
 def home():
     if(current_user.is_anonymous == False and current_user.is_admin == True):
         admin = True
+        manager = True
+    elif current_user.is_anonymous == False and current_user.is_manager == True:
+        admin = False
+        manager = True
     else:
         admin = False
+        manager = False
     proj_list = generate_all_film_next_projection()
+    new_proj = []
+    for dict in proj_list:
+        if not is_in(new_proj, dict["id_film"]):
+            new_proj.append(dict)
+    proj_list = new_proj
     ordered_list = sorted(proj_list, key = lambda i: (i['data'], i['ora_inizio']))
     ordered_list = ordered_list[:5]
-    return render_template('home.html', proj_list=ordered_list, is_admin=admin)
+    return render_template('home.html', proj_list=ordered_list, is_admin=admin, is_manager = manager)
 
 #--------------------------------------------------------------------------------------------#
 # Login
 # classe che rappresenta un nostro utente
 class Utente(UserMixin):
-    def __init__(self, email, password, is_admin):  # costruttore
+    def __init__(self, email, password, is_admin, is_manager):  # costruttore
         self.email = email
         self.password = password
         self.is_admin = is_admin
+        self.is_manager = is_manager
 
     def get_id(self):  # metodo che restituisce l'id (in questo caso, la email)
         return self.email
@@ -323,7 +315,7 @@ def load_user(user_email):  # funzione che restituisce l'utente associato alla u
     user = result.fetchone()
     conn.close()
     # ritorna un Utente
-    return Utente(user.email, user.password, user.is_admin)
+    return Utente(user.email, user.password, user.is_admin, user.is_manager)
 
 
 # Quando il login è richiesto, e non sei loggato, vieni rimandato al login
@@ -372,7 +364,7 @@ def logout():
 @ app.route('/home_gestione_sito')
 @ login_required
 def home_gestione_sito():
-    if(current_user.is_admin == True):
+    if(current_user.is_manager == True):
         return render_template('AdminTemplate/home_gestione_sito.html')
     else:
         return errore_admin()
@@ -383,7 +375,7 @@ def home_gestione_sito():
 @ app.route('/aggiungi_persona', methods=['GET', 'POST'])
 @ login_required
 def aggiungi_persona():
-    if(current_user.is_admin == True):
+    if(current_user.is_manager == True):
         if request.method == 'POST':
             # prendiamo i dati dal form
             nome = request.form["nome"]
@@ -395,7 +387,7 @@ def aggiungi_persona():
                 'nome': nome,
                 'cognome': cognome,
             }
-            conn = admin_engine.connect()  # mi connetto
+            conn = manager_engine.connect()  # mi connetto
             conn.execute(ins, values)  # eseguo l'inserimento con i valori
             conn.close()
             # abbiamo due diversi bottoni di sumbit
@@ -412,7 +404,7 @@ def aggiungi_persona():
 @ app.route('/aggiungi_film', methods=['GET', 'POST'])
 @ login_required
 def aggiungi_film():
-    if(current_user.is_admin == True):
+    if(current_user.is_manager == True):
         dict_p = generate_persone_dict()
         dict_g = generate_generi_dict()
         if request.method == 'POST':
@@ -460,7 +452,7 @@ def aggiungi_film():
             # di prenderci il suo id... ma dobbiamo essere sicuri che nel mentre nessuno
             # aggiunga altri film: l'id preso risulterebbe quindi sbagliato.
             # Questo id poi ci serve per collegarlo agli attori e ai registi che recitano/dirigono il film inserito
-            with admin_engine.connect().execution_options(isolation_level="SERIALIZABLE") as conn:
+            with manager_engine.connect().execution_options(isolation_level="SERIALIZABLE") as conn:
                 trans = conn.begin()
                 try:
                     conn.execute(ins, values)
@@ -477,7 +469,7 @@ def aggiungi_film():
 
             copertina.save("./static/copertine/" + str(id_film) + ".jpg")
 
-            conn = admin_engine.connect()
+            conn = manager_engine.connect()
             # prendo le tre tabelle
             attori = meta.tables["attori"]
             registi = meta.tables["registi"]
@@ -580,7 +572,7 @@ def aggiungi_admin():
 @ app.route('/riepilogo_sale', methods=['GET', 'POST'])
 @ login_required
 def riepilogo_sale():
-    if(current_user.is_admin == True):
+    if(current_user.is_manager == True):
         if request.method == 'POST':
             n_posti = 150  # per semplicità, tutte le nostre sale hanno 150 posti
 
@@ -589,7 +581,7 @@ def riepilogo_sale():
             values = {  # dizionario per i valori
                 'n_posti': n_posti,
             }
-            conn = admin_engine.connect()  # mi connetto
+            conn = manager_engine.connect()  # mi connetto
             conn.execute(ins, values)  # eseguo l'inserimento con i valori
             conn.close()
             return redirect(url_for('riepilogo_sale'))  # return
@@ -602,12 +594,12 @@ def riepilogo_sale():
 @ app.route('/aggiungi_proiezione', methods=['GET', 'POST'])
 @ login_required
 def aggiungi_proiezione():
-    if(current_user.is_admin == True):
+    if(current_user.is_manager == True):
         if request.method == 'POST':
             film = request.form["film"]
             proiezioni = meta.tables['proiezioni']
             ins = proiezioni.insert()
-            conn = admin_engine.connect()
+            conn = manager_engine.connect()
             row = dict()
             i = 0
             for elem in request.form:
@@ -636,7 +628,7 @@ def aggiungi_proiezione():
 @ app.route('/aggiungi_genere', methods=['GET', 'POST'])
 @ login_required
 def aggiungi_genere():
-    if(current_user.is_admin == True):
+    if(current_user.is_manager == True):
         if request.method == 'POST':
             # prendiamo i dati dal form
             tipo = request.form["tipo"]
@@ -644,7 +636,7 @@ def aggiungi_genere():
             genere = meta.tables['genere']  # prendo la tabella
 
             s = select([genere]).where(genere.c.tipo == tipo)
-            conn = anonim_engine.connect()
+            conn = manager_engine.connect()
             result = conn.execute(s)
             conn.close()
 
@@ -715,6 +707,31 @@ def rimuovi_proiezione():
     else:
         return errore_admin()
 
+@ app.route('/statistiche')
+@ login_required
+def statistiche():
+    '''
+    numero di film:
+        select count(*) as numfilm
+        from film
+
+    film con più proiezioni:
+        create or replace view num_pr_film(id_film, num_proiezioni) as
+        select id_film, count(id_proiezione)
+        from film left join proiezioni on film.id_film = proiezioni .film
+        group by id_film
+
+        select *
+        from film f natural join num_pr_film n
+        where n.num_proiezioni = (select max(num_proiezioni) from num_pr_film )
+
+    film con più posti prenotati totali:
+        create or replace view num_posti_pr_film(id_film, num_posti) as
+        select id_film, count(id_posto)
+        from film left join proiezioni on film.id_film = proiezioni .film natural join posti
+        group by id_film
+    '''
+    return render_template('AdminTemplate/statistiche.html');
 
 #--------------------------------------------------------------------------------------------#
 #--------------------------------------------------------------------------------------------#
@@ -761,6 +778,7 @@ def registrazione():
                 'email': email,
                 'password': hashed_psw,
                 'is_admin': False,
+                'is_manager': False,
                 'saldo': 0.0
             }
             conn.execute(ins, values)  # eseguo l'inserimento con i valori
@@ -917,10 +935,19 @@ def prenota_biglietto(id_pr):
         return render_template('UserTemplate/prenota_biglietto.html', rossi = occupati, titolo=row["titolo"], data=row["data"], ora=row["ora_inizio"], sala=row["sala"], id=id_pr)
 #--------------------------------------------------------------------------------------------#
 # visualizziamo tutti i film con la prossima proiezione in programma
+
 @ app.route('/tutti_i_film', methods=['GET', 'POST'])
 def tutti_i_film():
     proj_list = generate_all_film_next_projection()
     if request.method == "POST":
+        if request.form["cerca_genere"]:
+            genere = request.form["cerca_genere"].capitalize()
+            proj_list = filter(lambda d: d["genere"] == genere, proj_list)
+    new_proj = []
+    for dict in proj_list:
+        if not is_in(new_proj, dict["id_film"]):
+            new_proj.append(dict)
+    proj_list = new_proj
     ordered_list = sorted(proj_list, key = lambda i: (i['titolo']))
     return render_template('UserTemplate/tutti_i_film.html', proj_list=ordered_list)
 

@@ -1,0 +1,78 @@
+{% extends "main_template.html" %}
+
+{% block pagebody %}
+<style>
+  h2 {
+    margin-left: 2em;
+  }
+  h3 {
+    margin-left: 4em;
+  }
+  h4 {
+    margin-left: 8em;
+  }
+</style>
+
+
+
+  <h1>Statistiche</h1>
+    <h2>Statistiche sui film</h2>
+      <h3>Numero di film proposti</h3>
+        <h4>Numero film proposti: {{ num_film_proposti }}</h4>
+
+      <h3>Film con più proiezioni</h3>
+        <h4>{{ titolo_film_piu_proiezioni }}: {{ num_proiezioni_max_film }}</h4>
+
+      <h3>Film con più posti prenotati totali</h3>
+        <h4>{{ titolo_film_piu_posti }}: {{ num_posti_max_film }}</h4>
+
+      <h3>Film con più incassi totali</h3>
+        <h4>{{ titolo_film_piu_incassi }}: {{ num_incassi_max_film }}</h4>
+
+      <h3>Genere con più posti prenotati</h3>
+        <h4>{{ genere_piu_posti }}: {{ num_posti_max_genere }}</h4>
+
+      <h3>Genere con più incassi</h3>
+        <h4>{{ genere_piu_incassi }}: {{ num_incassi_max_genere }}</h4>
+
+    <h2>Statistiche sulle proiezioni</h2>
+      <h3>Numero di proiezioni totale</h3>
+        <h4> Numero proiezioni totale: {{ num_proiezioni_totali }}</h4>
+
+      <h3>Proiezione più prenotata</h3>
+        <h4>{{ proiezione_piu_posti }}: {{ num_posti_max_proiezione }}</h4>
+
+      <h3>Proiezione con l'incasso più alto</h3>
+        <h4>{{ proiezione_piu_incassi }}: {{ num_incassi_max_proiezione }}</h4>
+
+      <h3>Orario in cui ci sono state più prenotazioni</h3>
+        <h4>{{ orario_piu_prenotazioni }}: {{ num_prenotazioni_max_orario }}</h4>
+
+
+    <h2>Statistiche sugli attori e registi</h2>
+      <h3>Attore che appare in più film</h3>
+        <h4>{{ attore_max_film }}: {{ num_film_max_attore }}</h4>
+
+      <h3>Regista che ha diretto più film</h3>
+        <h4>{{ regista_max_film }}: {{ num_film_max_regista }}</h4>
+
+    <h2>Statistiche sugli utenti</h2>
+      <h3>Numero di utenti iscritti</h3>
+        <h4> Numero totale utenti iscritti: {{ num_utenti_iscritti }}</h4>
+
+      <h3>Numero di posti prenotati in media da un utente</h3>
+        <h4>{{ posti_media_utente }}: {{ num_posti_media_utente }}</h4>
+
+      <h3>Età media utenti</h3>
+        <h4>{{ posti_media_utente }}: {{ num_posti_media_utente }}</h4>
+
+
+    <h2>Statistiche sulle sale</h2>
+      <h3>Numero proiezioni per sala</h3>
+        <h4>Sala {{ num_sala_proiezioni }}: {{ num_proiezioni_tot_sala }}</h4>
+
+      <h3>Durata media dei film per sala</h3>
+        <h4>Sala {{ num_sala_media_film }}: {{ num_durata_media_film }}</h4>
+
+
+{% endblock %}
