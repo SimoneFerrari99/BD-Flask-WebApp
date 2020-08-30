@@ -39,11 +39,14 @@ function invia(id_proiezione){
   }).then(function (response){
     return response.text();
   }).then(function (text){
-    if(text.localeCompare("Conflict") == 0){
+    if(text.localeCompare("Unassigned") == 0){
       alertError("Saldo insufficiente, prego ricaricare il saldo.");
       window.location.href = "/ricarica_saldo";
     }
     else{
+      if((text.localeCompare("Conflict") == 0)){
+        alertError("Qualcosa è andato storto :( riprovare.");
+      }
       window.location.href = "/prenota_biglietto/"+id;
     }
   }).catch(function (error){

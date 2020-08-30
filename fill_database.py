@@ -11,8 +11,9 @@ from create_database import utenti, film, genere, persone, sale, genere_film, pr
 from sqlalchemy import create_engine
 from flask_bcrypt import Bcrypt
 
-engine = create_engine("postgres+psycopg2://admin:passwordadmin@localhost/progettobd")
-#engine = create_engine("postgres+psycopg2://giulio:Giulio99:)@/progettobd")
+#engine = create_engine("postgres+psycopg2://admin:passwordadmin@localhost/progettobd")
+engine = create_engine("postgres+psycopg2://giulio:Giulio99:)@/progettobd")
+#engine = create_engine("postgres+psycopg2://postgres:simone@localhost/progettobd")
 
 
 conn = engine.connect()

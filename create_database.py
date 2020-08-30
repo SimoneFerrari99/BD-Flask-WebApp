@@ -139,8 +139,7 @@ conn.execute("GRANT UPDATE ON utenti TO clienti")
 conn.execute("GRANT INSERT ON posti TO clienti")
 
 conn.execute("GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO superuser")
-conn.execute(
-    "GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO superuser")
+conn.execute("GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO superuser")
 
 conn.execute("GRANT SELECT ON ALL TABLES IN SCHEMA public TO anonimous")
 conn.execute("GRANT INSERT ON utenti TO anonimous")
@@ -153,16 +152,20 @@ conn.execute("GRANT anonimous TO anonim")
 conn.execute('''create or replace function refund() returns trigger as $refund$
                BEGIN
                    UPDATE utenti
-                   SET saldo = (SELECT saldo FROM utenti WHERE email = old.id_proiezione) + (SELECT DISTINCT prezzo FROM posti)
-                   WHERE email = (SELECT prenotato FROM posti WHERE id_proiezione = old.id_proiezione);
-                   RETURN NULL;
+                   SET saldo = sottoquery.vecchio_saldo + sottoquery.da_rimborsare
+                   FROM (SELECT u.email, u.saldo as vecchio_saldo, sum(p.prezzo) as da_rimborsare
+                         FROM utenti u JOIN posti p ON (u.email = p.prenotato)
+                         WHERE p.id_proiezione = OLD.id_proiezione
+                         GROUP BY u.email, u.saldo) AS sottoquery
+                   WHERE utenti.email = sottoquery.email;
+                   RETURN OLD;
                END;
                $refund$ LANGUAGE plpgsql;''')
 
 conn.execute('''CREATE TRIGGER refund
                BEFORE DELETE ON proiezioni
                FOR EACH ROW
-               WHEN (OLD.data >= current_date AND OLD.ora_inizio > current_time)
+               WHEN (OLD.data > current_date OR (OLD.data = current_date AND OLD.ora_inizio > current_time))
                EXECUTE PROCEDURE refund()''')
 
 

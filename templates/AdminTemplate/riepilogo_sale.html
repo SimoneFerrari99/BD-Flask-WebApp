@@ -2,9 +2,9 @@
 
 {% block pagebody %}
 
-  <h2>Sale disponibili:</h2><br>
+  <h2>Sale disponibili:</h2>
   {% for n_sala in sale %}
-    <p id="sala">{{ n_sala }}</p>
+    <p id="sala">Sala {{ n_sala }}</p>
   {% endfor %}
   <form method="post">
     <button type = "submit" name = "aggiungi_sala">Aggiungi sala

@@ -170,33 +170,33 @@ def generate_all_film_next_projection():
     pr = meta.tables['proiezioni']
     film = meta.tables['film']
 
-    j = film.join(proiezioni, proiezioni.c.film == film.c.id_film)
-
-    s1 = select([film.c.titolo, film.c.durata, pr.c.sala, pr.c.film, pr.c.data, func.min(pr.c.ora_inizio).label("prox_proiezione")]).\
-        select_from(j).\
-        where(pr.c.data == (select([func.min(proiezioni.c.data)]).\
-                            where(
-                                and_(
-                                    or_(
-                                        proiezioni.c.data > func.current_date(),
-                                        and_(
-                                            proiezioni.c.data == func.current_date(),
-                                            proiezioni.c.ora_inizio >= func.current_time()
-                                            )
-                                        ),
-                                     proiezioni.c.film == pr.c.film
-                                    )
-                                 )
-                            )
-        ).\
-        group_by(film.c.titolo, pr.c.film, pr.c.data, film.c.durata, pr.c.sala)
+#    j = film.join(proiezioni, proiezioni.c.film == film.c.id_film)
+#
+#    s1 = select([film.c.titolo, film.c.durata, pr.c.sala, pr.c.film, pr.c.data, func.min(pr.c.ora_inizio).label("prox_proiezione")]).\
+#        select_from(j).\
+#        where(pr.c.data == (select([func.min(proiezioni.c.data)]).\
+#                            where(
+#                                and_(
+#                                    or_(
+#                                        proiezioni.c.data > func.current_date(),
+#                                        and_(
+#                                            proiezioni.c.data == func.current_date(),
+#                                            proiezioni.c.ora_inizio >= func.current_time()
+#                                            )
+#                                        ),
+#                                     proiezioni.c.film == pr.c.film
+#                                    )
+#                                 )
+#                            )
+#        ).\
+#        group_by(film.c.titolo, pr.c.film, pr.c.data, film.c.durata, pr.c.sala)
 
     s = '''
         select f.titolo, f.descrizione, f.durata, pr.id_proiezione, pr.sala, pr.film, pr."data" , min(pr.ora_inizio ) as "prox_proiezione"
-        from proiezioni pr join film f on pr.film = f.id_film
+        from proiezioni pr join film f on pr.film = f.id_film join
         where pr.data = (select min("data" )
-                     from proiezioni
-                     where ("data" > current_date or ("data" = current_date and ora_inizio >= current_time)) and film = pr.film )
+                         from proiezioni
+                         where ("data" > current_date or ("data" = current_date and ora_inizio >= current_time)) and film = pr.film )
         group by (f.titolo, f.descrizione, pr.film, pr.id_proiezione, pr."data", f.durata, pr.sala)
     '''
 
@@ -890,7 +890,7 @@ def prenota_biglietto(id_pr):
                     trans.commit()
                 else:
                     trans.rollback()
-                    return "Conflict", 409
+                    return "Unassigned", 430
             except:
                 trans.rollback()
                 return "Conflict", 409
@@ -917,9 +917,10 @@ def prenota_biglietto(id_pr):
         return render_template('UserTemplate/prenota_biglietto.html', rossi = occupati, titolo=row["titolo"], data=row["data"], ora=row["ora_inizio"], sala=row["sala"], id=id_pr)
 #--------------------------------------------------------------------------------------------#
 # visualizziamo tutti i film con la prossima proiezione in programma
-@ app.route('/tutti_i_film')
+@ app.route('/tutti_i_film', methods=['GET', 'POST'])
 def tutti_i_film():
     proj_list = generate_all_film_next_projection()
+    if request.method == "POST":
     ordered_list = sorted(proj_list, key = lambda i: (i['titolo']))
     return render_template('UserTemplate/tutti_i_film.html', proj_list=ordered_list)
 

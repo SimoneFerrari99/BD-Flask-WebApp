@@ -17,7 +17,7 @@
 
     <label for = "film">Scegli il film da cui vuoi eliminare la proiezione:</label>
     <select name="film" id="film" onchange='selectProiezioni({{ proiezioni|safe }})' autofocus>
-      <option value="" selected disabled hidden>Scegli qui</option>
+            <option value="" selected disabled hidden>Scegli qui</option>
       {% for id_film, titolo in film_dict.items() %}
       <option value={{id_film}}>{{titolo[0]}}</option>
       {% endfor %}

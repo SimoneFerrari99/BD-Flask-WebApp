@@ -37,6 +37,19 @@
 
   <h2>Tutte le proiezioni programmate</h2>
 
+  <script>
+      function selezionaPr(){
+        let select = document.getElementById("proiezioni");
+      	let currently_selected = select.options[select.selectedIndex].value;
+        let bottone = document.getElementById("invio");
+        bottone.setAttribute("onClick", "location.href = '/prenota_biglietto/" + currently_selected + "'")
+      }
+
+      function alertError(messaggio){
+        alert(messaggio);
+      }
+  </script>
+
     <div style="float:left">
       <img src="{{ url_for('static', filename='copertine/') }}{{ dict_film[0]['id_film'] }}.jpg" height="200" width="150" alt="copertina di {{ dict_film[0]['titolo'] }}">
     </div>
@@ -46,14 +59,15 @@
       <p id="descrizione">{{ dict_film[0]["descrizione"] }}</p>
 
       <label for="prenotazioni">Date programmate:
-        <select id="tendina">
+        <select id="proiezioni" onchange='selezionaPr()'>
+          <option value="" selected disabled hidden>Scegli qui</option>
           {% for dict in dict_film %}
-          <option value=" {{ dict['data'] }} "> {{ dict["data"] }} {{ dict["ora_inizio"] }} sala {{ dict["sala"] }}</option>
+          <option value="{{ dict['id_proiezione'] }}"> {{ dict["data"] }} {{ dict["ora_inizio"] }} sala {{ dict["sala"] }}</option>
           {% endfor %}
         </select>
       </label>
 
-      <input style="margin-left: 1.4em;" type="button" onclick="location.href='/prenota_biglietto/{{ dict_film[0]['id_proiezione'] }}';" value="Acquista" /> <br>
+      <input style="margin-left: 1.4em;" type="button" onclick="alertError('Attenzione, selezionare una proiezione prima di procedere')" id="invio" value="Acquista" /> <br>
     </div>
     <div style="clear:both"/>
 

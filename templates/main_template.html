@@ -13,6 +13,7 @@
 	</head>
 	<body>
 		<script>
+
 		function getCookie(name) {
 	    var dc = document.cookie;
 	    var prefix = name + "=";
@@ -38,8 +39,12 @@
 				utente = utente.replace('"', '');
 				utente = utente.replace('"', '');
 				console.log(utente);
-				scritta = document.getElementById('login');
-				scritta.innerHTML = utente;
+				login = document.getElementById('login');
+				login.innerHTML = utente;
+				login.setAttribute("href", "/dashboard_account");
+				logout = document.getElementById('registrazione');
+				logout.innerHTML = "Logout";
+				logout.setAttribute("href", "/logout");
 			}
 		}
 		</script>
@@ -51,7 +56,7 @@
 				<div style="float:right; margin-top: 1em;">
 					<h3>
 						<a href="/login/False/None" id="login">Login</a>
-						<a style="margin-left: 10px;" href="/logout">Logout</a>
+						<a style="margin-left: 10px;" href="/registrazione" id="registrazione">Registrati</a>
 					  <img style="margin-left: 10px;" align="middle" src="{{url_for('static', filename='immagini/user.svg')}}" height="50" width="50">
 				  </h3>
 				</div>
