@@ -44,7 +44,7 @@
       <h4 id="durata">{{ dict["durata"] }} minuti</h4>
       <p id="descrizione">{{ dict["descrizione"] }}</p>
       <h3 style="margin-top: 1em;" id="prossimaproiezione">Prossima proiezione: &nbsp; {{ dict["data"] }} &nbsp;&nbsp; {{ dict["ora_inizio"] }} &nbsp;&nbsp; Sala: {{ dict["sala"] }}</h3>
-      <input style="margin-left: 1.4em;" type="button" onclick="location.href='/prenota_biglietto';" value="Acquista" /> <br>
+      <input style="margin-left: 1.4em;" type="button" onclick="location.href='/prenota_biglietto/{{ dict['id_proiezione'] }}';" value="Acquista" /> <br>
       <input style="margin-top: 0.5em; margin-left: 1.4em;" type="button" onclick="location.href='/altre_date_film/{{ dict['id_film'] }}';" value="Altre date per questo film" />
     </div>
     <div style="clear:both"/>

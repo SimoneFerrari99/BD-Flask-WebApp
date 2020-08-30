@@ -19,11 +19,17 @@ engine = create_engine("postgres+psycopg2://postgres:simone@localhost/progettobd
 conn = engine.connect()
 
 
-#ins = utenti.insert()
-# conn.execute(ins, [
-#     {'nome': 'Simone', 'cognome': 'Ferrari', 'email': 'simone@gmail.com', 'password': '12345', 'saldo': '0.0'},
-#
-# ])
+ins = utenti.insert()
+conn.execute(ins, [
+     {'nome': 'Simone', 'cognome': 'Ferrari', 'data_nascita': '1999-06-09', 'email': 'simoneferrari@gmail.com', 'password': '$2b$12$fGMFScRQsoWzitWPUcI8guvAfwUQMeg3AzlO.wetVD1toMEuDQWcG', 'is_admin': True, 'is_manager': True, 'saldo': '100.0'},
+     {'nome': 'Giulio', 'cognome': 'Trolese', 'data_nascita': '1999-04-20', 'email': 'giuliotrolese@gmail.com', 'password': '$2b$12$fGMFScRQsoWzitWPUcI8guvAfwUQMeg3AzlO.wetVD1toMEuDQWcG', 'is_admin': False, 'is_manager': True, 'saldo': '0.0'},
+     {'nome': 'Giulio', 'cognome': 'Casarotti', 'data_nascita': '1998-12-14', 'email': 'giuliocasarotti@gmail.com', 'password': '$2b$12$fGMFScRQsoWzitWPUcI8guvAfwUQMeg3AzlO.wetVD1toMEuDQWcG', 'is_admin': False, 'is_manager': False, 'saldo': '0.0'},
+
+     {'nome': 'Irene', 'cognome': 'Bianchi', 'data_nascita': '1952-01-15', 'email': 'irenebianchi@gmail.com', 'password': '$2b$12$m9JHWemug09LRHexku4ofOxpE4mAOg..2RJrUuYfh7StQ4Tf3zSvW', 'is_admin': False, 'is_manager': False, 'saldo': '15.0'},
+     {'nome': 'Alessandro', 'cognome': 'Pagnotto', 'data_nascita': '1982-02-23', 'email': 'alessandropagnotto@gmail.com', 'password': '$2b$12$m9JHWemug09LRHexku4ofOxpE4mAOg..2RJrUuYfh7StQ4Tf3zSvW', 'is_admin': False, 'is_manager': False, 'saldo': '30.0'},
+     {'nome': 'Nicola', 'cognome': 'Pugliesi', 'data_nascita': '1998-01-08', 'email': 'nicolapugliesi@gmail.com', 'password': '$2b$12$m9JHWemug09LRHexku4ofOxpE4mAOg..2RJrUuYfh7StQ4Tf3zSvW', 'is_admin': False, 'is_manager': False, 'saldo': '10.0'},
+
+])
 
 ins = film.insert()
 conn.execute(ins, [
@@ -217,10 +223,18 @@ conn.execute(ins, [
 
 
 #ins = posti.insert()
-# conn.execute(ins, [
-#         {'id_posto': 1, 'prezzo': , 'prenotato': '', 'proiezioni': },
-#
-# ])
+#conn.execute(ins, [
+#        {'id_posto': 44, 'prezzo': 5, 'prenotato': 'simoneferrari@gmail.com', 'proiezioni': 25},
+#        {'id_posto': 45, 'prezzo': 5, 'prenotato': 'simoneferrari@gmail.com', 'proiezioni': 25},
+#        {'id_posto': 46, 'prezzo': 5, 'prenotato': 'simoneferrari@gmail.com', 'proiezioni': 25},
+#        {'id_posto': 60, 'prezzo': 5, 'prenotato': 'giuliotrolese@gmail.com', 'proiezioni': 25},
+#        {'id_posto': 61, 'prezzo': 5, 'prenotato': 'giuliotrolese@gmail.com', 'proiezioni': 25},
+#        {'id_posto': 62, 'prezzo': 5, 'prenotato': 'giuliotrolese@gmail.com', 'proiezioni': 25},
+#        {'id_posto': 63, 'prezzo': 5, 'prenotato': 'giuliotrolese@gmail.com', 'proiezioni': 25},
+#        {'id_posto': 21, 'prezzo': 5, 'prenotato': 'giuliocasarotti@gmail.com', 'proiezioni': 25},
+#        {'id_posto': 22, 'prezzo': 5, 'prenotato': 'giuliocasarotti@gmail.com', 'proiezioni': 25},
+
+#])
 
 
 ins = attori.insert()
