@@ -12,12 +12,15 @@ from sqlalchemy.dialects.postgresql import ENUM
 
 #---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---#
 # postgre dialect doc https://docs.sqlalchemy.org/en/13/dialects/postgresql.html
+
 # usiamo le dbapi psycopg2
 # api url: https://docs.sqlalchemy.org/en/13/dialects/postgresql.html#module-sqlalchemy.dialects.postgresql.psycopg2
-# engine = create_engine(
-# "postgres+psycopg2://postgres:ciao@serversrv.ddns.net:2345/progetto2020")
-#engine = create_engine("postgres+psycopg2://giulio:Giulio99:)@/progettobd")
+#e ngine = create_engine("postgres+psycopg2://postgres:ciao@109.115.89.210:2345/progettobd")
+# engine = create_engine("postgres+psycopg2://giulio:Giulio99:)@/progettobd")
 engine = create_engine("postgres+psycopg2://postgres:simone@localhost/progettobd")
+
+# engine = create_engine("postgres+psycopg2://NOMEUTENTE:PASSWORD@localhost/progettobd") da mettere in riga 20 #modifica qui le tue credenziali
+
 
 # funzione di sqlalchemy_utils che, se non esiste l'url del database, lo crea
 if database_exists(engine.url):  # elimina se esiste e lo ricrea
@@ -29,7 +32,6 @@ metadata = MetaData()  # oggetto su cui vengono salvate le tabelle
 
 
 #---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---#
-
 utenti = Table('utenti', metadata,
                Column('nome', String(255), nullable = False),
                Column('cognome', String(255), nullable = False),
@@ -110,14 +112,7 @@ metadata.create_all(engine)
 
 #---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---#
 # Creazione ruoli e assegnazione permessi
-# TODO:
-
-#       1) Creare un utente nel db per ogni utente del nostro sito, identificato da un nome utente (email) e Password (password)
-#       2) Definiamo due ruoli: admin con tutti i permessi e cliente con permessi limitati
-#       3) Diamo il ruolo giusto ad ogni utente
-
 conn = engine.connect()
-
 
 conn.execute("DROP USER IF EXISTS admin")
 conn.execute('DROP USER IF EXISTS manager')
@@ -151,15 +146,16 @@ conn.execute("GRANT UPDATE ON ALL TABLES IN SCHEMA public TO managers")
 conn.execute("GRANT INSERT ON ALL TABLES IN SCHEMA public TO managers")
 conn.execute("GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO managers")
 
-
 conn.execute("GRANT SELECT ON ALL TABLES IN SCHEMA public TO anonimous")
 conn.execute("GRANT INSERT ON utenti TO anonimous")
-
 
 conn.execute("GRANT superuser TO admin")
 conn.execute("GRANT managers TO manager")
 conn.execute("GRANT clienti TO cliente")
 conn.execute("GRANT anonimous TO anonim")
+
+#---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---#
+# Definizione dei TRIGGER
 
 conn.execute('''create or replace function refund() returns trigger as $refund$
                BEGIN

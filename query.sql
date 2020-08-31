@@ -52,9 +52,9 @@ where n.num_posti = (select max(num_posti)
 
 --Genere con più incassi:
 select *
-from incasso_per_ogni_genere n
+from numero_posti_totali_prenotati_e_incasso_per_genere n
 where n.incasso = (select max(incasso)
-                  from incasso_per_ogni_genere);
+                  from numero_posti_totali_prenotati_e_incasso_per_genere);
 
 -------------------------------------------------------------------------------------------------------------
 --Numero di proiezioni totale
@@ -124,7 +124,7 @@ select u.email, count(po.id_posto)
 from posti po join utenti u on po.prenotato = u.email
 group by u.email;
 
-select avg(num_prenotazioni)
+select avg(num_prenotazioni) as num_prenotazioni_media
 from utente_prenotazioni;
 
 --Età media utenti
@@ -133,7 +133,7 @@ select u.email, (current_date-u.data_nascita)/365.25
 from utenti u
 group by u.email;
 
-select avg(eta)
+select avg(eta) as eta_media
 from utente_eta;
 -------------------------------------------------------------------------------------------------------------
 --Numero proiezioni per sala

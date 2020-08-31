@@ -11,19 +11,16 @@ from create_database import utenti, film, genere, persone, sale, genere_film, pr
 from sqlalchemy import create_engine
 from flask_bcrypt import Bcrypt
 
-#engine = create_engine("postgres+psycopg2://admin:passwordadmin@localhost/progettobd")
-#engine = create_engine("postgres+psycopg2://giulio:Giulio99:)@/progettobd")
-engine = create_engine("postgres+psycopg2://postgres:simone@localhost/progettobd")
-
-
+engine = create_engine("postgres+psycopg2://admin:passwordadmin@localhost/progettobd")
+#---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---#
+# Inserimento dei dati di esempio
 conn = engine.connect()
-
 
 ins = utenti.insert()
 conn.execute(ins, [
      {'nome': 'Simone', 'cognome': 'Ferrari', 'data_nascita': '1999-06-09', 'email': 'simoneferrari@gmail.com', 'password': '$2b$12$fGMFScRQsoWzitWPUcI8guvAfwUQMeg3AzlO.wetVD1toMEuDQWcG', 'is_admin': True, 'is_manager': True, 'saldo': '100.0'},
-     {'nome': 'Giulio', 'cognome': 'Trolese', 'data_nascita': '1999-04-20', 'email': 'giuliotrolese@gmail.com', 'password': '$2b$12$fGMFScRQsoWzitWPUcI8guvAfwUQMeg3AzlO.wetVD1toMEuDQWcG', 'is_admin': False, 'is_manager': True, 'saldo': '0.0'},
-     {'nome': 'Giulio', 'cognome': 'Casarotti', 'data_nascita': '1998-12-14', 'email': 'giuliocasarotti@gmail.com', 'password': '$2b$12$fGMFScRQsoWzitWPUcI8guvAfwUQMeg3AzlO.wetVD1toMEuDQWcG', 'is_admin': False, 'is_manager': False, 'saldo': '0.0'},
+     {'nome': 'Giulio', 'cognome': 'Trolese', 'data_nascita': '1999-04-20', 'email': 'giuliotrolese@gmail.com', 'password': '$2b$12$fGMFScRQsoWzitWPUcI8guvAfwUQMeg3AzlO.wetVD1toMEuDQWcG', 'is_admin': False, 'is_manager': False, 'saldo': '0.0'},
+     {'nome': 'Giulio', 'cognome': 'Casarotti', 'data_nascita': '1998-12-14', 'email': 'giuliocasarotti@gmail.com', 'password': '$2b$12$fGMFScRQsoWzitWPUcI8guvAfwUQMeg3AzlO.wetVD1toMEuDQWcG', 'is_admin': False, 'is_manager': True, 'saldo': '0.0'},
 
      {'nome': 'Irene', 'cognome': 'Bianchi', 'data_nascita': '1952-01-15', 'email': 'irenebianchi@gmail.com', 'password': '$2b$12$m9JHWemug09LRHexku4ofOxpE4mAOg..2RJrUuYfh7StQ4Tf3zSvW', 'is_admin': False, 'is_manager': False, 'saldo': '15.0'},
      {'nome': 'Alessandro', 'cognome': 'Pagnotto', 'data_nascita': '1982-02-23', 'email': 'alessandropagnotto@gmail.com', 'password': '$2b$12$m9JHWemug09LRHexku4ofOxpE4mAOg..2RJrUuYfh7StQ4Tf3zSvW', 'is_admin': False, 'is_manager': False, 'saldo': '30.0'},
@@ -68,7 +65,6 @@ conn.execute(ins, [
     {'tipo': 'Thriller'}
 ])
 
-
 ins = persone.insert()
 conn.execute(ins, [
     {'nome': 'Leonardo', 'cognome': 'Di Caprio'},
@@ -98,14 +94,12 @@ conn.execute(ins, [
     {'nome': 'Cristopher', 'cognome': 'Nolan'}
 ])
 
-
 ins = sale.insert()
 conn.execute(ins, [
     {'n_posti': 150},
     {'n_posti': 150},
     {'n_posti': 150}
 ])
-
 
 ins = genere_film.insert()
 conn.execute(ins, [
@@ -142,7 +136,6 @@ conn.execute(ins, [
     {'id_film': 15, 'tipo_genere': 'Spionaggio'},
     {'id_film': 15, 'tipo_genere': 'Storico'}
 ])
-
 
 ins = proiezioni.insert()
 conn.execute(ins, [
@@ -223,7 +216,6 @@ conn.execute(ins, [
 
 ])
 
-
 ins = posti.insert()
 conn.execute(ins, [
         {'id_posto': 100, 'prezzo': 5, 'prenotato': 'nicolapugliesi@gmail.com', 'id_proiezione': 20},
@@ -263,7 +255,6 @@ conn.execute(ins, [
 
 ])
 
-
 ins = attori.insert()
 conn.execute(ins, [
     {'id_persona': 1, 'id_film': 1},
@@ -292,7 +283,6 @@ conn.execute(ins, [
     {'id_persona': 8, 'id_film': 15},
     {'id_persona': 16, 'id_film': 15}
 ])
-
 
 ins = registi.insert()
 conn.execute(ins, [

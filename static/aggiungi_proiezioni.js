@@ -4,16 +4,18 @@ function increment() {
 	i += 1;
 }
 
-function removeElement(parentDiv, childDiv) {
-	if (childDiv == parentDiv) {
+//funzione per rimuovere un elemento dal proprio elemento "padre"
+function removeElement(parentId, childId) {
+	if (childId == parentId) {
 		alert("The parent div cannot be removed.");
 	} else {
-		let child = document.getElementById(childDiv);
-		let parent = document.getElementById(parentDiv);
+		let child = document.getElementById(childId);
+		let parent = document.getElementById(parentId);
 		parent.removeChild(child);
 	}
 }
 
+//funzione per creare un campo per l'aggiunta di una proiezione
 function addProjection(sale) {
 	let span = document.createElement("SPAN");
 	span.setAttribute("id", "span_proiezione_" + i);
@@ -37,7 +39,7 @@ function addProjection(sale) {
 	label_data.setAttribute("for", "data_" + i);
 	label_data.innerHTML = "Data: ";
 
-	let data = document.createElement("INPUT");
+	let data = document.createElement("INPUT"); //campo per la data
 	data.setAttribute("type", "date")
 	data.setAttribute("name", "data_" + i);
 	data.setAttribute("id", "data_" + i);
@@ -46,7 +48,7 @@ function addProjection(sale) {
 	label_ora.setAttribute("for", "ora_" + i);
 	label_ora.innerHTML = "Orario: ";
 
-  let ora = document.createElement("INPUT");
+  let ora = document.createElement("INPUT"); //campo per l'ora
 	ora.setAttribute("type", "time")
   ora.setAttribute("name", "ora_" + i);
   ora.setAttribute("id", "ora_" + i);

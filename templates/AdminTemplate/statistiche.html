@@ -3,78 +3,113 @@
 {% block pagebody %}
 <style>
   h2 {
-    margin-left: 2em;
+    margin-top: 3em;
   }
   h3 {
-    margin-left: 4em;
+    margin-top: 0em;
+    margin-left: 2em;
   }
-  h4 {
-    margin-left: 8em;
+  p {
+    margin-top: -0.5em;
+    margin-left: 4em;
+    font-size:17px
   }
 </style>
 
 
-
   <h1>Statistiche</h1>
-    <h2>Statistiche sui film</h2>
+    <h2 style="margin-top: -0.5em;">Statistiche sui film</h2>
       <h3>Numero di film proposti</h3>
-        <h4>Numero film proposti: {{ num_film_proposti }}</h4>
+        {% for dict in statistiche["n_film"] %}
+          <p>Numero film proposti: &nbsp <b>{{ dict["numfilm"] }}</b></p>
+        {% endfor %}
 
       <h3>Film con più proiezioni</h3>
-        <h4>{{ titolo_film_piu_proiezioni }}: {{ num_proiezioni_max_film }}</h4>
+        {% for dict in statistiche["film_piu_proiezioni"] %}
+          <p>{{ dict["titolo"] }}: &nbsp <b>{{ dict["num_proiezioni"] }}</b></p>
+        {% endfor %}
 
       <h3>Film con più posti prenotati totali</h3>
-        <h4>{{ titolo_film_piu_posti }}: {{ num_posti_max_film }}</h4>
+        {% for dict in statistiche["film_piu_posti"] %}
+          <p>{{ dict["titolo"] }}: &nbsp <b>{{ dict["num_posti"] }}</b></p>
+        {% endfor %}
 
       <h3>Film con più incassi totali</h3>
-        <h4>{{ titolo_film_piu_incassi }}: {{ num_incassi_max_film }}</h4>
+        {% for dict in statistiche["film_piu_incasso"] %}
+          <p>{{ dict["titolo"] }}: &nbsp <b>{{ dict["incasso"] }} €</b></p>
+        {% endfor %}
 
       <h3>Genere con più posti prenotati</h3>
-        <h4>{{ genere_piu_posti }}: {{ num_posti_max_genere }}</h4>
+        {% for dict in statistiche["genere_piu_posti"] %}
+          <p>{{ dict["tipo_genere"] }}: &nbsp <b>{{ dict["num_posti"] }}</b></p>
+        {% endfor %}
 
       <h3>Genere con più incassi</h3>
-        <h4>{{ genere_piu_incassi }}: {{ num_incassi_max_genere }}</h4>
-
+        {% for dict in statistiche["genere_piu_incassi"] %}
+          <p>{{ dict["tipo_genere"] }}: &nbsp <b>{{ dict["incasso"] }} €</b></p>
+        {% endfor %}
 
     <h2>Statistiche sulle proiezioni</h2>
       <h3>Numero di proiezioni totale</h3>
-        <h4> Numero proiezioni totale: {{ num_proiezioni_totali }}</h4>
+        {% for dict in statistiche["n_proiezioni"] %}
+          <p> Numero proiezioni totale: &nbsp <b>{{ dict["numproiezioni"] }}</b></p>
+        {% endfor %}
 
       <h3>Proiezione più prenotata</h3>
-        <h4>{{ proiezione_piu_posti }}: {{ num_posti_max_proiezione }}</h4>
+        {% for dict in statistiche["pr_piu_prenotata"] %}
+          <p>{{ dict["titolo"] }} &nbsp; {{ dict["data"] }} &nbsp; {{ dict["ora_inizio"] }} &nbsp; sala {{ dict["sala"] }}: &nbsp <b>{{ dict["num_posti"] }}</b></p>
+        {% endfor %}
 
       <h3>Proiezione con l'incasso più alto</h3>
-        <h4>{{ proiezione_piu_incassi }}: {{ num_incassi_max_proiezione }}</h4>
+        {% for dict in statistiche["pr_piu_incasso"] %}
+          <p>{{ dict["titolo"] }} &nbsp {{ dict["data"] }} &nbsp {{ dict["ora_inizio"] }} &nbsp sala {{ dict["sala"] }}: &nbsp <b>{{ dict["incasso"] }} €</b></p>
+        {% endfor %}
 
       <h3>Orario in cui ci sono state più prenotazioni</h3>
-        <h4>{{ orario_piu_prenotazioni }}: {{ num_prenotazioni_max_orario }}</h4>
+        {% for dict in statistiche["orario_piu_pr"] %}
+          <p>{{ dict["ora_inizio"] }}: &nbsp <b>{{ dict["num_posti"] }}</b></p>
+        {% endfor %}
 
 
     <h2>Statistiche sugli attori e registi</h2>
       <h3>Attore che appare in più film</h3>
-        <h4>{{ attore_max_film }}: {{ num_film_max_attore }}</h4>
+        {% for dict in statistiche["attore_piu_film"] %}
+          <p>{{ dict["nome"] }} {{ dict["cognome"] }}: &nbsp <b>{{ dict["num_film"] }}</b></p>
+        {% endfor %}
 
       <h3>Regista che ha diretto più film</h3>
-        <h4>{{ regista_max_film }}: {{ num_film_max_regista }}</h4>
+        {% for dict in statistiche["regista_piu_film"] %}
+          <p>{{ dict["nome"] }} {{ dict["cognome"] }}: &nbsp <b>{{ dict["num_film"] }}</b></p>
+        {% endfor %}
 
 
     <h2>Statistiche sugli utenti</h2>
       <h3>Numero di clienti iscritti</h3>
-        <h4> Numero totale clienti iscritti: {{ num_clienti_iscritti }}</h4>
+        {% for dict in statistiche["n_clienti"] %}
+          <p> Numero totale clienti iscritti: &nbsp <b>{{ dict["numutenti"] }}</b></p>
+        {% endfor %}
 
       <h3>Numero di posti prenotati in media da un utente</h3>
-        <h4>{{ posti_media_utente }}: {{ num_posti_media_utente }}</h4>
+        {% for dict in statistiche["n_posti_medio"] %}
+          <p>Numero di posti prenotati in media: &nbsp <b>{{ dict["num_prenotazioni_media"] }}</b></p>
+        {% endfor %}
 
       <h3>Età media utenti</h3>
-        <h4>{{ posti_media_utente }}: {{ num_posti_media_utente }}</h4>
+        {% for dict in statistiche["eta_media_user"] %}
+          <p>Età: &nbsp <b>{{ dict["eta_media"] }}</b></p>
+        {% endfor %}
 
 
     <h2>Statistiche sulle sale</h2>
       <h3>Numero proiezioni per sala</h3>
-        <h4>Sala {{ num_sala_proiezioni }}: {{ num_proiezioni_tot_sala }}</h4>
+        {% for dict in statistiche["numero_proiezioni_sala"] %}
+          <p>Sala {{ dict["n_sala"] }}: <b>{{ dict["num_proiezioni"] }}</b></p>
+        {% endfor %}
 
       <h3>Durata media dei film per sala</h3>
-        <h4>Sala {{ num_sala_media_film }}: {{ num_durata_media_film }}</h4>
+        {% for dict in statistiche["durata_media_per_sala"] %}
+          <p>Sala {{ dict["n_sala"] }}: &nbsp <b>{{ dict["durata_media"] }}</b></p>
+        {% endfor %}
 
 
 {% endblock %}

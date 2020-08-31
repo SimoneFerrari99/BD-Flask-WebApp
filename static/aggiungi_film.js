@@ -4,16 +4,17 @@ function increment() { //funzione che incrementa la variabile globale i
 	i += 1;
 }
 
-function removeElement(parentDiv, childDiv) { //rimuove un elemento
-	if (childDiv == parentDiv) {
+function removeElement(parentId, childId) { //rimuove un elemento HTML
+	if (childId == parentId) {
 		alert("The parent div cannot be removed.");
 	} else {
-		let child = document.getElementById(childDiv);
-		let parent = document.getElementById(parentDiv);
+		let child = document.getElementById(childId);
+		let parent = document.getElementById(parentId);
 		parent.removeChild(child);
 	}
 }
 
+//persone è un dizionario di persone identificate da un id, tipo indica il tipo di quella persona ossia attore o regista
 function addPeople(persone, tipo) { //funzione per aggiungere un campo attori o registi
 	let span = document.createElement("SPAN"); //creo lo span
 	span.setAttribute("id", "span_" + tipo + "_" + i);
@@ -26,12 +27,12 @@ function addPeople(persone, tipo) { //funzione per aggiungere un campo attori o 
 		label.innerHTML = "Regista: ";
 	}
 
-	let select = document.createElement("SELECT");
+	let select = document.createElement("SELECT"); //creo un menu a tendina
 	select.setAttribute("name", tipo + "_" + i);
 	select.setAttribute("id", tipo + "_" + i);
 
 	for (let id in persone) {
-		let opt = document.createElement("OPTION"); //creo il menù a tendina
+		let opt = document.createElement("OPTION"); //creo le opzioni per il menu a tendina
 		opt.setAttribute("value", id);
 		opt.text = persone[id];
 		select.appendChild(opt);
@@ -66,7 +67,8 @@ function addPeople(persone, tipo) { //funzione per aggiungere un campo attori o 
 	document.getElementById(tipo).appendChild(span);
 }
 
-function addGenre(generi) {
+//generi è un dizionario con i generi disponibili
+function addGenre(generi) { //funzione per aggiungere un campo di selezione per il genere
 	let span = document.createElement("SPAN");
 	span.setAttribute("id", "span_genere_" + i);
 
