@@ -1,3 +1,8 @@
+/*
+	Progetto basi di dati 2020 - Tema Cinema
+	Gruppo: ArceCity
+	Membri: Casarotti Giulio, Ferrari Simone, Trolese Gulio
+*/
 //funzione per rimuovere i campi option di una select (chiamata quando cambio scelta dal primo campo della rimuovi film)
 function removeProiezioni() {
 	let proiezioni_sel = document.getElementById("proiezione"); //prendo elemento html grazie al suo id

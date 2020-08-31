@@ -1,3 +1,8 @@
+/*
+	Progetto basi di dati 2020 - Tema Cinema
+	Gruppo: ArceCity
+	Membri: Casarotti Giulio, Ferrari Simone, Trolese Gulio
+*/
 let importo = 0;
 let posti_sel = [];
 

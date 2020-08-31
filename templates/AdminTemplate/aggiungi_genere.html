@@ -1,3 +1,10 @@
+<!--
+	Progetto basi di dati 2020 - Tema Cinema
+	Gruppo: ArceCity
+	Membri: Casarotti Giulio, Ferrari Simone, Trolese Gulio
+
+	pagina per aggiungere un genere
+ -->
 {% extends "main_template.html" %}
 
 {% block pagebody %}
@@ -14,7 +21,7 @@
   <form method = "post"  autocomplete = "on" enctype = ”text/plain”>
 
     <label for = "tipo">Tipo:</label>
-    <input id = "tipo" name = "tipo" type = "text" autofocus><br>
+    <input id = "tipo" name = "tipo" type = "text" autofocus pattern="^[a-zA-Z ']*$"><br>
 
     <button type = "submit" name = "Submit" value = "Invia">Invia
     <button type = "reset" value = "Reset">Reset
