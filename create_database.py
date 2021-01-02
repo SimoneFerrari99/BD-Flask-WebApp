@@ -17,7 +17,7 @@ from sqlalchemy.dialects.postgresql import ENUM
 # api url: https://docs.sqlalchemy.org/en/13/dialects/postgresql.html#module-sqlalchemy.dialects.postgresql.psycopg2
 #e ngine = create_engine("postgres+psycopg2://postgres:ciao@109.115.89.210:2345/progettobd")
 # engine = create_engine("postgres+psycopg2://giulio:Giulio99:)@/progettobd")
-engine = create_engine("postgres+psycopg2://postgres:simone@localhost/progettobd")
+engine = create_engine("postgres+psycopg2://postgres:simone@localhost:5433/progettobd")
 
 # engine = create_engine("postgres+psycopg2://NOMEUTENTE:PASSWORD@localhost/progettobd") da mettere in riga 20 #modifica qui le tue credenziali
 

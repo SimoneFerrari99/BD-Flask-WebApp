@@ -27,10 +27,10 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 # apriamo l'engine creato in precedenza in fase di creazione del database (file create_database.py)
 
-anonim_engine = create_engine("postgres+psycopg2://anonim:passwordanonim@localhost/progettobd")
-clienti_engine = create_engine("postgres+psycopg2://cliente:passwordcliente@localhost/progettobd")
-admin_engine = create_engine("postgres+psycopg2://admin:passwordadmin@localhost/progettobd")
-manager_engine = create_engine("postgres+psycopg2://manager:passwordmanager@localhost/progettobd")
+anonim_engine = create_engine("postgres+psycopg2://anonim:passwordanonim@localhost:5433/progettobd")
+clienti_engine = create_engine("postgres+psycopg2://cliente:passwordcliente@localhost:5433/progettobd")
+admin_engine = create_engine("postgres+psycopg2://admin:passwordadmin@localhost:5433/progettobd")
+manager_engine = create_engine("postgres+psycopg2://manager:passwordmanager@localhost:5433/progettobd")
 
 #---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---@---#
 # prendiamo i metadata dell'engine
